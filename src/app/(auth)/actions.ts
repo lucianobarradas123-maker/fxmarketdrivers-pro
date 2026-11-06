@@ -19,8 +19,15 @@ export async function signIn(_: FormState, form: FormData): Promise<FormState> {
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
-  // Mensagem genérica: não revela se o email existe.
-  if (error) return { error: "Email ou palavra-passe incorretos, ou conta ainda não confirmada.", email };
+  if (error) {
+    // Falha de comunicação com o serviço ≠ credenciais erradas.
+    if (!error.code || (error.status ?? 0) >= 500) {
+      console.error("Login falhou (serviço):", error.name, error.status, error.message);
+      return { error: `Não foi possível contactar o serviço de autenticação (${error.name} ${error.status ?? ""}).`.trim(), email };
+    }
+    // Mensagem genérica: não revela se o email existe.
+    return { error: "Email ou palavra-passe incorretos, ou conta ainda não confirmada.", email };
+  }
 
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   redirect(aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2" ? "/login/2fa" : "/");
@@ -58,13 +65,13 @@ export async function signUp(_: FormState, form: FormData): Promise<FormState> {
   });
   if (error) {
     console.error("Registo falhou:", error.code, error.status, error.message);
-    return { error: signUpError(error.code, error.message), email };
+    return { error: signUpError(error.code, error.message, `${error.name} ${error.status ?? ""}`.trim()), email };
   }
   return { message: "Conta criada. Abre o email de confirmação que te enviámos (verifica também o spam)." };
 }
 
 /** Traduz os erros do Supabase em mensagens claras (sem revelar dados sensíveis). */
-function signUpError(code: string | undefined, message: string): string {
+function signUpError(code: string | undefined, message: string, detail: string): string {
   switch (code) {
     case "signup_disabled":
       return "O registo de novas contas está fechado.";
@@ -81,7 +88,7 @@ function signUpError(code: string | undefined, message: string): string {
       return "Não foi possível criar a conta com este email. Se já te registaste, entra pela página de login.";
     default:
       if (/signups? not allowed|disabled/i.test(message)) return "O registo de novas contas está fechado.";
-      return `Não foi possível criar a conta (código: ${code ?? "desconhecido"}). Envia este código ao suporte.`;
+      return `Não foi possível criar a conta (código: ${code ?? "sem código"} · ${detail}). Envia esta mensagem ao suporte.`;
   }
 }
 
