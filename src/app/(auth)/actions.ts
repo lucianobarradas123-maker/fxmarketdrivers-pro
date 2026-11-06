@@ -57,10 +57,32 @@ export async function signUp(_: FormState, form: FormData): Promise<FormState> {
     options: { emailRedirectTo: `${origin}/auth/callback` },
   });
   if (error) {
-    if (/signups? not allowed|disabled/i.test(error.message)) return { error: "O registo de novas contas está fechado.", email };
-    return { error: "Não foi possível criar a conta. Tenta novamente.", email };
+    console.error("Registo falhou:", error.code, error.status, error.message);
+    return { error: signUpError(error.code, error.message), email };
   }
   return { message: "Conta criada. Abre o email de confirmação que te enviámos (verifica também o spam)." };
+}
+
+/** Traduz os erros do Supabase em mensagens claras (sem revelar dados sensíveis). */
+function signUpError(code: string | undefined, message: string): string {
+  switch (code) {
+    case "signup_disabled":
+      return "O registo de novas contas está fechado.";
+    case "email_address_not_authorized":
+      return "Este email não é aceite pelo serviço de email de teste do Supabase, que só envia para os emails da equipa do projeto. Usa o mesmo email da tua conta Supabase.";
+    case "over_email_send_rate_limit":
+      return "Foi atingido o limite de emails do serviço de teste (2 por hora). Tenta novamente daqui a uma hora.";
+    case "email_address_invalid":
+      return "Este endereço de email não é aceite. Verifica se está bem escrito.";
+    case "weak_password":
+      return "A palavra-passe não cumpre os requisitos de segurança.";
+    case "user_already_exists":
+    case "email_exists":
+      return "Não foi possível criar a conta com este email. Se já te registaste, entra pela página de login.";
+    default:
+      if (/signups? not allowed|disabled/i.test(message)) return "O registo de novas contas está fechado.";
+      return `Não foi possível criar a conta (código: ${code ?? "desconhecido"}). Envia este código ao suporte.`;
+  }
 }
 
 const codeSchema = z.string().regex(/^\d{6}$/, "O código tem 6 dígitos.");
