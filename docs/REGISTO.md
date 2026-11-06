@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 2 construída, a aguardar publicação (Vercel) e teste com o utilizador · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 2 construída, publicada em https://fxmarketdrivers-pro-syjy.vercel.app — a aguardar criação da conta · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -49,6 +49,7 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D34 | Palavra-passe: mínimo 12 caracteres, maiúsculas, minúsculas e números | Configurado no Supabase e validado na app. |
 | D35 | Registo aberto só até o utilizador criar a conta; depois desligado | App de um só utilizador. |
 | D36 | Mantido Cache Components do Next.js (partes com sessão carregam em Suspense) | Será obrigatório na próxima versão do Next.js. |
+| D37 | Alojamento: Vercel Hobby, publicação automática a partir do ramo main | Gratuito para uso pessoal. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -68,8 +69,10 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [ ] Rever leituras dos bancos centrais após as reuniões de dezembro (8–18/12)
 - [x] Etapa 2 (construída): login + registo + 2FA (TOTP) + página Conta; calendário com catálogo de eventos,
       valor real, apagar; painel principal ligado ao calendário (próximo evento com contagem decrescente)
-- [ ] Publicar na Vercel (utilizador cria conta e liga o GitHub)
-- [ ] Configurar no Supabase: site_url e redirect URL para o endereço publicado
+- [x] Publicada na Vercel: https://fxmarketdrivers-pro-syjy.vercel.app (publica sozinha a cada push no GitHub)
+- [x] Supabase: site_url e redirect URL configurados para o endereço publicado
+- [x] Cabeçalhos de segurança HTTP (X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy)
+- [ ] Política de segurança de conteúdo (CSP) — avaliar antes do uso intensivo
 - [ ] Utilizador cria a conta e ativa a 2FA → desligar registo (disable_signup)
 - [ ] Testar o calendário com sessão iniciada (não foi possível testar aqui sem conta real)
 - [ ] Edição da leitura dos bancos centrais na app (tabela leituras_bancos já existe)
