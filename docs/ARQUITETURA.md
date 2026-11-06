@@ -1,0 +1,78 @@
+# Arquitetura — FX Market Drivers Pro
+
+_Fase 4 — Arquitetura · proposta de 06/11/2026 · estado: APROVADA_
+
+## 1. Visão geral
+
+```
+ Telemóvel / Computador (browser, instalável como app — PWA)
+                │  HTTPS + sessão autenticada
+                ▼
+ ┌──────────────────────────────────────────┐
+ │  Aplicação Next.js (frontend + servidor) │  ← alojada na Vercel
+ │  - Ecrãs (React)                         │
+ │  - Rotas de servidor (chaves API aqui)   │
+ │  - Tarefas agendadas (recolha de dados)  │
+ └───────────────┬──────────────────────────┘
+                 │
+     ┌───────────┴───────────┐
+     ▼                       ▼
+ Base de dados            Fontes externas
+ PostgreSQL (Supabase)    - Preços FX
+ - diário, definições     - Dados macro
+ - cache de dados         - Calendário económico
+   c/ fonte + hora
+```
+
+Regra de ouro: **o browser nunca fala diretamente com as fontes de dados** — tudo passa pelo servidor,
+que guarda as chaves API, faz cache e regista origem/hora de cada valor.
+
+## 2. Tecnologias (recomendação + alternativas)
+
+| Camada | Recomendado | Alternativas consideradas | Porquê |
+|---|---|---|---|
+| Frontend | Next.js + React + TypeScript | SvelteKit; Vue/Nuxt | Maior ecossistema, PWA fácil, frontend e servidor no mesmo projeto. TypeScript apanha erros cedo. |
+| Estilos | Tailwind CSS (tokens do estilo A) | CSS Modules | Rápido de manter consistente com o design aprovado. |
+| Gráfico de velas | TradingView Lightweight Charts | ECharts; Highcharts (pago comercial) | Gratuito (Apache 2.0, exige atribuição), leve, feito para finanças. |
+| Outros gráficos | Recharts | ECharts; D3 | Simples para barras/estatísticas do diário. |
+| Backend | Rotas de servidor do Next.js | API separada em Python (FastAPI) | Um só projeto = menos complexidade. Python fica como opção futura (backtesting/IA). |
+| Base de dados | PostgreSQL gerido (Supabase) | SQLite local; Neon | Acesso de qualquer dispositivo; inclui autenticação e regras de acesso. |
+| Autenticação | Supabase Auth + 2FA (TOTP) | Passkeys; Auth.js | App exposta à internet ⇒ login obrigatório mesmo sendo só para 1 pessoa. |
+| Alojamento | Vercel (plano Hobby) | Netlify; servidor próprio | Gratuito para uso pessoal não comercial; publicação automática a partir do GitHub. |
+| Código | Repositório GitHub privado | — | Histórico, cópia de segurança, publicação automática. |
+
+### Limitações a conhecer
+- **Vercel Hobby**: só uso pessoal/não comercial. Se comercializar → plano pago.
+- **Supabase gratuito**: o projeto é pausado após ~1 semana sem utilização (reativa-se manualmente); limites de espaço. Para uso diário não é problema; plano pago se necessário.
+- Condições e preços de terceiros mudam — confirmar antes de cada adesão.
+
+## 3. Fontes de dados
+
+| Necessidade | Fonte candidata | Origem | Frequência | Limitações |
+|---|---|---|---|---|
+| Velas diárias (ATR, tendência D1) | **Massive** (ex-Polygon.io) — testado nesta sessão | Agregação de cotações de mercado interbancário/fornecedores | Diária (barra fecha 00:00 UTC) | No plano testado: diárias ✅, horárias ❌. Preços não são os da IC Markets (diferenças pequenas). |
+| Velas H1/H4 (day trading) | Twelve Data (plano gratuito) — a testar | Agregador de fornecedores FX | Intradiária, atrasada | Limite diário e por minuto de pedidos no gratuito; confirmar condições atuais. |
+| Alternativa intradiária | MetaTrader 5 (preços reais IC Markets) | A própria corretora | Tempo real | Exige MT5 + PC Windows ligado a enviar dados; mais complexo. Fase posterior. |
+| Macro EUA | FRED (Fed de St. Louis) / Massive | Fontes oficiais (BLS, BEA, Fed) | Mensal/trimestral, com atraso de publicação | Gratuito (FRED exige chave). |
+| Macro restantes 7 economias | DBnomics (agrega OCDE, FMI, Eurostat, BCE) + FRED (séries internacionais) | Institutos de estatística nacionais via OCDE/FMI | Mensal/trimestral | Algumas séries chegam com semanas de atraso; requer mapeamento série a série. |
+| Taxas de juro dos bancos centrais | Atualização manual após cada reunião (~8/ano por banco) + validação BIS | Bancos centrais | Por reunião | Manual = ~5 min por reunião; encaixa na leitura "híbrida" do BC. |
+| Calendário económico | **Decisão em aberto** (ver §5) | — | — | Fontes gratuitas fiáveis são raras; scraping de sites (ex.: Forex Factory) viola os termos de uso — excluído. |
+
+Cada valor guardado na base de dados terá: `fonte`, `obtido_em`, `tipo` (tempo real / atrasado / fim de dia / manual)
+e a app mostra aviso quando um dado está desatualizado.
+
+## 4. Segurança e responsabilidade
+
+- Chaves API só no servidor (variáveis de ambiente cifradas na Vercel); nunca no código, nunca no browser, `.env` fora do Git.
+- Login com palavra-passe forte + 2FA; sessão com expiração; regras de acesso na base de dados (Row Level Security).
+- HTTPS obrigatório; cópias de segurança da base de dados.
+- **Nenhuma credencial da IC Markets/MetaTrader é guardada.** Importação futura apenas por ficheiro exportado.
+- Validação de dados: rejeitar valores absurdos (picos, buracos), comparar fontes quando possível, mostrar idade do dado.
+- Separação Informação / Análise / Decisão em toda a interface; sem linguagem de "sinal" ou "garantia".
+- Execução de ordens: **fora do âmbito**. Se for reconsiderada, exige análise prévia de riscos técnicos, de segurança e regulamentares.
+
+## 5. Decisões
+1. ✅ Stack aprovada (§2).
+2. ✅ Calendário: manual (alto impacto) no MVP; MQL5 (MT5) ou API paga como evolução.
+3. ✅ MT5.
+4. ✅ Orçamento até 30 €/mês; arrancar a 0 €.

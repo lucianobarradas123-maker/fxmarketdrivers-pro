@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Tokens do estilo aprovado: A — Noturno profissional (ver docs/REGISTO.md, D13/D14) */
+@theme {
+  --color-bg: #0b0f14;
+  --color-bar: #0e131a;
+  --color-surface: #121820;
+  --color-surface-2: #18202a;
+  --color-inset: #0f141b;
+  --color-line: #222c38;
+  --color-line-soft: #1a222c;
+  --color-line-strong: #2c3743;
+  --color-ink: #e7ecf2;
+  --color-ink-2: #a7b1bd;
+  --color-muted: #93a0af;
+  --color-faint: #7d8a99;
+
+  /* Azul = forte/subida · Laranja = fraca/descida (acessível a daltonismo) */
+  --color-up: #5aa9ff;
+  --color-up-soft: #9cc8ff;
+  --color-up-line: #2b4a6e;
+  --color-down: #f5a04a;
+  --color-down-soft: #f5c28a;
+  --color-down-line: #6b4a24;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in {
+    animation: fade-in 240ms ease-out both;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+  }
 }
