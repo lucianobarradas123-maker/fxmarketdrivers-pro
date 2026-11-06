@@ -36,6 +36,19 @@ export function TopBar() {
         </nav>
         <div className="flex-1" />
         <DataStatus meta={MACRO_META} prefix="Macro: OCDE" />
+        <Link
+          href="/conta"
+          aria-label="Conta e segurança"
+          aria-current={pathname === "/conta" ? "page" : undefined}
+          className={`grid size-11 place-items-center rounded-full border transition-colors ${
+            pathname === "/conta" ? "border-up-line text-up-soft" : "border-line text-ink-2 hover:text-ink"
+          }`}
+        >
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+            <circle cx="10" cy="7" r="3.5" />
+            <path d="M3.5 17c1.2-3 3.6-4.5 6.5-4.5s5.3 1.5 6.5 4.5" strokeLinecap="round" />
+          </svg>
+        </Link>
       </div>
     </header>
   );

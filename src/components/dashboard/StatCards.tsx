@@ -1,4 +1,9 @@
+import Link from "next/link";
+import { Suspense } from "react";
 import { Label } from "@/components/ui/Card";
+import { Countdown } from "@/components/ui/Countdown";
+import { getUpcoming } from "@/lib/events";
+import { formatTime } from "@/lib/time";
 import { decimal, signed } from "@/lib/format";
 import type { getDashboard } from "@/lib/dashboard";
 
@@ -14,10 +19,33 @@ function Stat({ label, children, note }: { label: React.ReactNode; children: Rea
   );
 }
 
-function duration(min: number) {
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+async function NextEventStat({ pairs }: { pairs: string[] }) {
+  const { now, events } = await getUpcoming(14, "alto");
+  const next = events[0];
+  const label = (
+    <div className="flex items-center justify-between">
+      <Label>Próximo evento · alto impacto</Label>
+      {next && <span className="size-2 rounded-full bg-down" aria-hidden="true" />}
+    </div>
+  );
+  if (!next) {
+    return (
+      <Stat label={label} note="Regista os eventos da semana no calendário.">
+        <Link href="/calendario" className="text-[15px] font-semibold text-up-soft hover:text-ink">
+          Sem eventos registados
+        </Link>
+      </Stat>
+    );
+  }
+  const affected = pairs.filter((p) => p.includes(next.moeda)).length;
+  return (
+    <Stat label={label} note={`${formatTime(next.data_hora)} Lisboa · afeta ${affected} pares da tua lista`}>
+      <p className="text-lg font-semibold">
+        {next.moeda} · {next.nome}
+      </p>
+      <Countdown to={next.data_hora} initialNow={now} className="num text-[28px] font-semibold tracking-tight text-down" />
+    </Stat>
+  );
 }
 
 const VOL_LABEL = { baixa: "Baixa", normal: "Normal", elevada: "Elevada" } as const;
@@ -26,22 +54,9 @@ export function StatCards({ d }: { d: D }) {
   const volIdx = { baixa: 0, normal: 1, elevada: 2 }[d.marketVol.level];
   return (
     <section aria-label="Resumo" className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
-      <Stat
-        label={
-          <div className="flex items-center justify-between">
-            <Label>Próximo evento · alto impacto</Label>
-            <span className="size-2 rounded-full bg-down" aria-hidden="true" />
-          </div>
-        }
-        note={`${new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" }).format(new Date(d.nextHigh?.time ?? 0))} Lisboa · afeta ${d.affectedPairs} pares da tua lista`}
-      >
-        <p className="text-lg font-semibold">
-          {d.nextHigh ? `${d.nextHigh.currency} · ${d.nextHigh.name}` : "Sem eventos"}
-        </p>
-        {d.minutesToNextHigh !== null && (
-          <p className="num text-[28px] font-semibold tracking-tight text-down">{duration(d.minutesToNextHigh)}</p>
-        )}
-      </Stat>
+      <Suspense fallback={<Stat label={<Label>Próximo evento · alto impacto</Label>} note="A carregar…"><span /></Stat>}>
+        <NextEventStat pairs={d.pairs.map((p) => p.pair)} />
+      </Suspense>
       <Stat label={<Label>Moeda mais forte</Label>} note={`${d.strongest.bank} ${d.strongest.stance.toLowerCase()}`}>
         <p className="flex items-baseline gap-2.5">
           <span className="num text-[28px] font-semibold">{d.strongest.code}</span>

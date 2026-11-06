@@ -1,5 +1,5 @@
-/** Junta os dados e calcula o que o painel mostra. Macro = real; preços, técnica e eventos = exemplo. */
-import { SAMPLE_EVENTS, SAMPLE_NOW, SAMPLE_PAIRS } from "@/lib/data/sample";
+/** Junta os dados e calcula o que o painel mostra. Macro = real; preços e técnica = exemplo (eventos vêm do calendário). */
+import { SAMPLE_PAIRS } from "@/lib/data/sample";
 import type { Currency, CurrencyMacro } from "@/lib/data/types";
 import { getMacro } from "@/lib/macro/build";
 import { alignment, biasFrom, pairDivergence, volLevel } from "@/lib/macro/score";
@@ -38,11 +38,6 @@ export function getDashboard() {
     changePct: Math.round((avgRatio - 1) * 100),
   };
 
-  const now = new Date(SAMPLE_NOW).getTime();
-  const upcoming = SAMPLE_EVENTS.filter((e) => new Date(e.time).getTime() > now);
-  const nextHigh = upcoming.find((e) => e.impact === "alto");
-  const affectedPairs = nextHigh ? pairs.filter((p) => p.pair.includes(nextHigh.currency)).length : 0;
-
   return {
     currencies,
     pairs,
@@ -50,9 +45,5 @@ export function getDashboard() {
     weakest,
     widest,
     marketVol,
-    events: upcoming,
-    nextHigh,
-    minutesToNextHigh: nextHigh ? Math.round((new Date(nextHigh.time).getTime() - now) / 60000) : null,
-    affectedPairs,
   };
 }

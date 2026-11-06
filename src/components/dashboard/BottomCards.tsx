@@ -1,33 +1,46 @@
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { euros, signed } from "@/lib/format";
-import type { EconomicEvent } from "@/lib/data/types";
+import { Suspense } from "react";
+import { getUpcoming } from "@/lib/events";
+import { dayKey, formatTime, TZ } from "@/lib/time";
 import { SAMPLE_ACCOUNT, SAMPLE_JOURNAL } from "@/lib/data/sample";
 
 const IMPACT_STYLE = { alto: "text-down", médio: "text-ink", baixo: "text-faint" } as const;
 
-function eventTime(iso: string) {
-  const d = new Date(iso);
-  const day = new Intl.DateTimeFormat("pt-PT", { weekday: "short", timeZone: "Europe/Lisbon" }).format(d);
-  const time = new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" }).format(d);
-  const sameDay = d.toISOString().slice(0, 10) === "2026-11-06";
-  return sameDay ? time : `${day.replace(".", "")} ${time}`;
+function eventWhen(iso: string, now: number) {
+  const sameDay = dayKey(iso) === dayKey(new Date(now).toISOString());
+  if (sameDay) return formatTime(iso);
+  const day = new Intl.DateTimeFormat("pt-PT", { weekday: "short", timeZone: TZ }).format(new Date(iso)).replace(".", "");
+  return `${day} ${formatTime(iso)}`;
 }
 
-export function EventsCard({ events }: { events: EconomicEvent[] }) {
+async function EventsList() {
+  const { now, events } = await getUpcoming(7);
+  if (events.length === 0) {
+    return <p className="border-t border-line-soft py-3 text-[13px] text-muted">Sem eventos registados para os próximos 7 dias.</p>;
+  }
+  return (
+    <ul aria-labelledby="cal">
+      {events.slice(0, 6).map((e) => (
+        <li key={e.id} className="flex items-center gap-3 border-t border-line-soft py-2">
+          <span className="num w-[72px] text-[13px] text-muted">{eventWhen(e.data_hora, now)}</span>
+          <span className="num w-9 text-[13px] font-semibold">{e.moeda}</span>
+          <span className="min-w-0 flex-auto">{e.nome}</span>
+          <span className={`text-[11px] font-semibold uppercase ${IMPACT_STYLE[e.impacto]}`}>{e.impacto}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export function EventsCard() {
   return (
     <Card className="flex flex-col gap-2.5">
       <CardHeader id="cal" title="Próximos eventos" tag="informacao" />
-      <ul aria-labelledby="cal">
-        {events.map((e) => (
-          <li key={e.time + e.name} className="flex items-center gap-3 border-t border-line-soft py-2">
-            <span className="num w-[72px] text-[13px] text-muted">{eventTime(e.time)}</span>
-            <span className="num w-9 text-[13px] font-semibold">{e.currency}</span>
-            <span className="min-w-0 flex-auto">{e.name}</span>
-            <span className={`text-[11px] font-semibold uppercase ${IMPACT_STYLE[e.impact]}`}>{e.impact}</span>
-          </li>
-        ))}
-      </ul>
+      <Suspense fallback={<p className="text-[13px] text-muted">A carregar…</p>}>
+        <EventsList />
+      </Suspense>
       <Link href="/calendario" className="text-[13px] text-up-soft hover:text-ink">
         Ver calendário completo
       </Link>

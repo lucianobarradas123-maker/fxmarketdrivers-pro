@@ -76,3 +76,10 @@ e a app mostra aviso quando um dado está desatualizado.
 2. ✅ Calendário: manual (alto impacto) no MVP; MQL5 (MT5) ou API paga como evolução.
 3. ✅ MT5.
 4. ✅ Orçamento até 30 €/mês; arrancar a 0 €.
+
+## 6. Implementação da autenticação e base de dados (Etapa 2)
+- `src/proxy.ts`: renova a sessão e reencaminha para /login (sem sessão) ou /login/2fa (2FA por confirmar).
+- `src/lib/supabase/server.ts`: cliente do servidor; ações em `actions.ts` validadas com zod.
+- Tabelas: `eventos`, `leituras_bancos` — RLS `user_id = auth.uid()` e `sessao_segura()` (aal2 se houver 2FA).
+- Migrações: `npm run db:migrate`; testes de segurança: `npm run db:test` (anula tudo no fim).
+- Variáveis públicas: `.env.example` (URL e publishable key). Nenhuma chave secreta na app.

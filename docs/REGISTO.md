@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 1 concluída, a aguardar validação · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 2 construída, a aguardar publicação (Vercel) e teste com o utilizador · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -43,6 +43,12 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D28 | Parte "Dados" = média de 3 pontuações z entre as 8 moedas (juro, inflação vs. meta, variação do desemprego em 6 meses) × 1,5, limitada a ±2 | Mede força relativa, que é o que importa no Forex. Fórmula transparente, mostrada no ecrã. A rever com o uso. |
 | D29 | Taxas de juro mantidas manualmente | BIS via DBnomics parado em jun. 2025; as taxas mudam só ~8×/ano. |
 | D30 | Ambiente cloud próprio "fxmarketdrivers-pro" com acesso a api.db.nomics.world e sdmx.oecd.org | Necessário para obter dados; não altera o ambiente Default. |
+| D31 | Base de dados e login antecipados para a Etapa 2 (Supabase, projeto kbfncjkxhhfsueuzbgrp, região UE) | Calendário precisa de guardar dados; diário e leituras dos BC também. Aprovado. |
+| D32 | Estrutura da base de dados gerida por migrações (supabase/migrations, `npm run db:migrate`) com token via formulário seguro | Escolha do utilizador (2a). Token nunca no código nem no chat. |
+| D33 | Segurança: RLS por utilizador + exigência de sessão aal2 quando há 2FA; anónimos sem acesso; testes automáticos (`npm run db:test`) | Proteção na própria base de dados, não só na app. |
+| D34 | Palavra-passe: mínimo 12 caracteres, maiúsculas, minúsculas e números | Configurado no Supabase e validado na app. |
+| D35 | Registo aberto só até o utilizador criar a conta; depois desligado | App de um só utilizador. |
+| D36 | Mantido Cache Components do Next.js (partes com sessão carregam em Suspense) | Será obrigatório na próxima versão do Next.js. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -60,7 +66,13 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
       parte "Dados" automática, escala de 5 níveis, ecrã Macro, painel principal com ranking real, aviso de dados antigos
 - [ ] Automatizar `npm run data:macro` (agendamento) — antes do lançamento
 - [ ] Rever leituras dos bancos centrais após as reuniões de dezembro (8–18/12)
-- [ ] Etapa 2 — Calendário (registo manual de eventos de alto impacto)
+- [x] Etapa 2 (construída): login + registo + 2FA (TOTP) + página Conta; calendário com catálogo de eventos,
+      valor real, apagar; painel principal ligado ao calendário (próximo evento com contagem decrescente)
+- [ ] Publicar na Vercel (utilizador cria conta e liga o GitHub)
+- [ ] Configurar no Supabase: site_url e redirect URL para o endereço publicado
+- [ ] Utilizador cria a conta e ativa a 2FA → desligar registo (disable_signup)
+- [ ] Testar o calendário com sessão iniciada (não foi possível testar aqui sem conta real)
+- [ ] Edição da leitura dos bancos centrais na app (tabela leituras_bancos já existe)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 
 ## Referências
