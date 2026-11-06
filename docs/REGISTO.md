@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 2 construída, publicada em https://fxmarketdrivers-pro-syjy.vercel.app — a aguardar criação da conta · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 2 concluída · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -50,6 +50,7 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D35 | Registo aberto só até o utilizador criar a conta; depois desligado | App de um só utilizador. |
 | D36 | Mantido Cache Components do Next.js (partes com sessão carregam em Suspense) | Será obrigatório na próxima versão do Next.js. |
 | D37 | Alojamento: Vercel Hobby, publicação automática a partir do ramo main | Gratuito para uso pessoal. |
+| D38 | Variáveis do Supabase só no servidor (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY), tipo Secret na Vercel | A Vercel não aceita NEXT_PUBLIC_ como Secret; e a chave deixa de ir para o browser. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -73,8 +74,9 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Supabase: site_url e redirect URL configurados para o endereço publicado
 - [x] Cabeçalhos de segurança HTTP (X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy)
 - [ ] Política de segurança de conteúdo (CSP) — avaliar antes do uso intensivo
-- [ ] Utilizador cria a conta e ativa a 2FA → desligar registo (disable_signup)
-- [ ] Testar o calendário com sessão iniciada (não foi possível testar aqui sem conta real)
+- [x] Utilizador criou a conta (email confirmado) e ativou a 2FA; registo de novas contas desligado
+- [x] Calendário testado pelo utilizador (2 eventos registados)
+- [ ] Serviço de email próprio (SMTP) antes do lançamento — o de teste do Supabase só envia 2/hora e para a equipa
 - [ ] Edição da leitura dos bancos centrais na app (tabela leituras_bancos já existe)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 
