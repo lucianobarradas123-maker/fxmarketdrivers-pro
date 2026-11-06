@@ -82,4 +82,4 @@ e a app mostra aviso quando um dado está desatualizado.
 - `src/lib/supabase/server.ts`: cliente do servidor; ações em `actions.ts` validadas com zod.
 - Tabelas: `eventos`, `leituras_bancos` — RLS `user_id = auth.uid()` e `sessao_segura()` (aal2 se houver 2FA).
 - Migrações: `npm run db:migrate`; testes de segurança: `npm run db:test` (anula tudo no fim).
-- Variáveis públicas: `.env.example` (URL e publishable key). Nenhuma chave secreta na app.
+- Variáveis (só servidor): SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY — ver `.env.example`. Nenhuma chave secreta na app.
