@@ -13,8 +13,16 @@ export interface DataMeta {
 
 export type Currency = "USD" | "EUR" | "GBP" | "JPY" | "CHF" | "CAD" | "AUD" | "NZD";
 
-/** Leitura do utilizador sobre a postura do banco central (parte manual do viés híbrido). */
-export type BankStance = "Restritivo" | "Neutro" | "Expansionista";
+/**
+ * Leitura do utilizador sobre a postura do banco central (parte manual do viés híbrido).
+ * Escala de 5 níveis (D24): avalia a DIREÇÃO provável da próxima decisão, não o nível da taxa.
+ */
+export type BankStance =
+  | "Restritivo"
+  | "Lig. restritivo"
+  | "Neutro"
+  | "Lig. expansionista"
+  | "Expansionista";
 
 export interface CurrencyMacro {
   code: Currency;

@@ -1,9 +1,9 @@
 /**
  * DADOS DE EXEMPLO — não são dados reais de mercado.
  * Servem apenas para construir e testar a interface na Etapa 0.
- * Serão substituídos por fontes reais nas Etapas 1, 2 e 5 (ver docs/ARQUITETURA.md).
+ * Os dados macro já são reais (Etapa 1). Os restantes serão substituídos nas Etapas 2 a 5 (ver docs/ARQUITETURA.md).
  */
-import type { CurrencyMacro, DataMeta, EconomicEvent, PairSnapshot } from "./types";
+import type { DataMeta, EconomicEvent, PairSnapshot } from "./types";
 
 export const SAMPLE_META: DataMeta = {
   source: "Dados de exemplo",
@@ -15,17 +15,6 @@ export const SAMPLE_META: DataMeta = {
 export const SAMPLE_NOW = "2026-11-06T11:16:00Z";
 
 export const SAMPLE_ACCOUNT = { balance: 10_000, riskPct: 1 };
-
-export const SAMPLE_CURRENCIES: CurrencyMacro[] = [
-  { code: "USD", bank: "Fed", dataScore: 1.2, stance: "Restritivo" },
-  { code: "GBP", bank: "BoE", dataScore: 1.1, stance: "Neutro" },
-  { code: "AUD", bank: "RBA", dataScore: -0.4, stance: "Restritivo" },
-  { code: "CAD", bank: "BoC", dataScore: 0.2, stance: "Neutro" },
-  { code: "EUR", bank: "BCE", dataScore: -0.4, stance: "Neutro" },
-  { code: "NZD", bank: "RBNZ", dataScore: 0.1, stance: "Expansionista" },
-  { code: "CHF", bank: "SNB", dataScore: -0.5, stance: "Expansionista" },
-  { code: "JPY", bank: "BoJ", dataScore: -0.8, stance: "Expansionista" },
-];
 
 export const SAMPLE_PAIRS: PairSnapshot[] = [
   { pair: "USD/JPY", trend: "ascendente", atrPips: 112, atrAvg20Pips: 92 },

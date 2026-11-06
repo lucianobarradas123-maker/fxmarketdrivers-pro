@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 0 concluída, a aguardar validação · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 1 concluída, a aguardar validação · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -36,6 +36,13 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D21 | Plataforma: MT5 → opção futura de calendário MQL5 e importação de relatórios MT5 | Resposta do utilizador. |
 | D22 | Orçamento: até 30 €/mês; começar a 0 € e só pagar se um limite gratuito bloquear | Resposta do utilizador. |
 | D23 | Testes automáticos com Vitest para toda a lógica de cálculo | Cálculos financeiros têm de ser verificáveis. |
+| D24 | Leitura dos bancos centrais em 5 níveis (+1, +0,5, 0, −0,5, −1); avalia a direção da próxima decisão | Com subidas generalizadas, 3 níveis não distinguiam as moedas. Aprovado. |
+| D25 | Leituras iniciais aprovadas: Fed e BoE restritivo; BCE, BoJ, BoC, RBA lig. restritivo; RBNZ neutro; SNB lig. expansionista | Ver docs/BANCOS-CENTRAIS.md. |
+| D26 | Fonte macro automática: API pública da OCDE (sdmx.oecd.org), sem chave | DBnomics testado: dados parados em abr./mai. 2026 (6 meses de atraso). OCDE tem dados até set. 2026. |
+| D27 | Dados macro guardados num "retrato" (src/data/macro-snapshot.json) atualizado com `npm run data:macro` | Dados mensais mudam pouco; a app nunca falha por a fonte externa estar em baixo; cada valor guarda fonte e data. Automatizar mais tarde. |
+| D28 | Parte "Dados" = média de 3 pontuações z entre as 8 moedas (juro, inflação vs. meta, variação do desemprego em 6 meses) × 1,5, limitada a ±2 | Mede força relativa, que é o que importa no Forex. Fórmula transparente, mostrada no ecrã. A rever com o uso. |
+| D29 | Taxas de juro mantidas manualmente | BIS via DBnomics parado em jun. 2025; as taxas mudam só ~8×/ano. |
+| D30 | Ambiente cloud próprio "fxmarketdrivers-pro" com acesso a api.db.nomics.world e sdmx.oecd.org | Necessário para obter dados; não altera o ambiente Default. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -43,16 +50,18 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 e mede com dados reais o que funciona (ou não) para o utilizador.
 
 ## Perguntas em aberto
-- Validação da Etapa 0 pelo utilizador.
-- Ligação da conta GitHub ao Claude (repositório: lucianobarradas123-maker/fxmarketdrivers-pro).
+- Validação da Etapa 1 pelo utilizador.
 
 ## Tarefas pendentes
 - [x] Etapa 0 — Fundações: projeto Next.js 16, estilo A em tokens, navegação (computador + telemóvel),
       painel principal com dados de exemplo, 5 ecrãs "em construção", manifest PWA, 6 testes da lógica macro
-- [ ] Ligar repositório GitHub (aguarda ligação da conta em claude.ai/connect-github)
-- [ ] Etapa 1 — Painel macro com dados reais
+- [x] Repositório GitHub ligado: https://github.com/lucianobarradas123-maker/fxmarketdrivers-pro
+- [x] Etapa 1 — Macro com dados reais: fichas dos 8 bancos centrais, inflação e desemprego da OCDE,
+      parte "Dados" automática, escala de 5 níveis, ecrã Macro, painel principal com ranking real, aviso de dados antigos
+- [ ] Automatizar `npm run data:macro` (agendamento) — antes do lançamento
+- [ ] Rever leituras dos bancos centrais após as reuniões de dezembro (8–18/12)
+- [ ] Etapa 2 — Calendário (registo manual de eventos de alto impacto)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
-- [ ] Mapear séries macro (FRED/DBnomics) das 8 economias antes da Etapa 1
 
 ## Referências
 - Design aprovado: https://claude.ai/artifact/JqrTj1b737EdC6wxtWwP4e

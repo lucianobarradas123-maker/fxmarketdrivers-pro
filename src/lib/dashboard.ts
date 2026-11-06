@@ -1,13 +1,19 @@
-/** Junta os dados (de exemplo, por agora) e calcula o que o painel mostra. */
-import { SAMPLE_CURRENCIES, SAMPLE_EVENTS, SAMPLE_NOW, SAMPLE_PAIRS } from "@/lib/data/sample";
-import type { Currency } from "@/lib/data/types";
-import { alignment, biasFrom, pairDivergence, totalScore, volLevel } from "@/lib/macro/score";
+/** Junta os dados e calcula o que o painel mostra. Macro = real; preços, técnica e eventos = exemplo. */
+import { SAMPLE_EVENTS, SAMPLE_NOW, SAMPLE_PAIRS } from "@/lib/data/sample";
+import type { Currency, CurrencyMacro } from "@/lib/data/types";
+import { getMacro } from "@/lib/macro/build";
+import { alignment, biasFrom, pairDivergence, volLevel } from "@/lib/macro/score";
 
 export function getDashboard() {
-  const currencies = SAMPLE_CURRENCIES.map((c) => ({ ...c, total: totalScore(c) })).sort(
-    (a, b) => b.total - a.total,
-  );
-  const byCode = new Map(SAMPLE_CURRENCIES.map((c) => [c.code, c]));
+  // Macro: dados reais (OCDE + leitura manual dos bancos centrais) — Etapa 1.
+  const currencies = getMacro().map((c) => ({
+    code: c.code,
+    bank: c.bank,
+    dataScore: c.dataScore,
+    stance: c.stance,
+    total: c.total,
+  }));
+  const byCode = new Map<Currency, CurrencyMacro>(currencies.map((c) => [c.code, c]));
 
   const pairs = SAMPLE_PAIRS.map((p) => {
     const [base, quote] = p.pair.split("/") as [Currency, Currency];

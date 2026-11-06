@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/Icon";
 import { DataStatus } from "@/components/ui/DataStatus";
 import { NAV_ITEMS, isActive } from "./nav-items";
-import { SAMPLE_META } from "@/lib/data/sample";
+import { MACRO_META } from "@/lib/macro/meta";
 
 export function TopBar() {
   const pathname = usePathname();
@@ -35,7 +35,7 @@ export function TopBar() {
           })}
         </nav>
         <div className="flex-1" />
-        <DataStatus meta={SAMPLE_META} />
+        <DataStatus meta={MACRO_META} prefix="Macro: OCDE" />
       </div>
     </header>
   );

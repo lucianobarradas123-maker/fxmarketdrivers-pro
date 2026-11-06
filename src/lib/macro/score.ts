@@ -3,8 +3,18 @@ import type { BankStance, CurrencyMacro, Trend, VolLevel } from "@/lib/data/type
 /** Contributo da leitura do banco central para a pontuação total. */
 export const STANCE_POINTS: Record<BankStance, number> = {
   Restritivo: 1,
+  "Lig. restritivo": 0.5,
   Neutro: 0,
+  "Lig. expansionista": -0.5,
   Expansionista: -1,
+};
+
+export const STANCE_LABEL: Record<BankStance, string> = {
+  Restritivo: "Restritivo",
+  "Lig. restritivo": "Ligeiramente restritivo",
+  Neutro: "Neutro",
+  "Lig. expansionista": "Ligeiramente expansionista",
+  Expansionista: "Expansionista",
 };
 
 /** Pontuação total = dados (automático) + banco central (leitura do utilizador). Intervalo −3..+3. */

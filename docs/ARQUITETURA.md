@@ -53,8 +53,8 @@ que guarda as chaves API, faz cache e regista origem/hora de cada valor.
 | Velas diárias (ATR, tendência D1) | **Massive** (ex-Polygon.io) — testado nesta sessão | Agregação de cotações de mercado interbancário/fornecedores | Diária (barra fecha 00:00 UTC) | No plano testado: diárias ✅, horárias ❌. Preços não são os da IC Markets (diferenças pequenas). |
 | Velas H1/H4 (day trading) | Twelve Data (plano gratuito) — a testar | Agregador de fornecedores FX | Intradiária, atrasada | Limite diário e por minuto de pedidos no gratuito; confirmar condições atuais. |
 | Alternativa intradiária | MetaTrader 5 (preços reais IC Markets) | A própria corretora | Tempo real | Exige MT5 + PC Windows ligado a enviar dados; mais complexo. Fase posterior. |
-| Macro EUA | FRED (Fed de St. Louis) / Massive | Fontes oficiais (BLS, BEA, Fed) | Mensal/trimestral, com atraso de publicação | Gratuito (FRED exige chave). |
-| Macro restantes 7 economias | DBnomics (agrega OCDE, FMI, Eurostat, BCE) + FRED (séries internacionais) | Institutos de estatística nacionais via OCDE/FMI | Mensal/trimestral | Algumas séries chegam com semanas de atraso; requer mapeamento série a série. |
+| Inflação e desemprego (8 economias) | **OCDE — sdmx.oecd.org** ✅ em uso (D26) | Institutos de estatística nacionais, harmonizados pela OCDE | Mensal (NZ e desemprego CH trimestral); 1–3 meses de atraso de publicação | Sem chave. API recusa pedidos muito seguidos (o script espaça e repete). Desemprego suíço costuma vir mais atrasado. |
+| (alternativas avaliadas) | DBnomics; FRED | — | — | DBnomics: dados parados em abr./mai. 2026. FRED: exige chave na URL. |
 | Taxas de juro dos bancos centrais | Atualização manual após cada reunião (~8/ano por banco) + validação BIS | Bancos centrais | Por reunião | Manual = ~5 min por reunião; encaixa na leitura "híbrida" do BC. |
 | Calendário económico | **Decisão em aberto** (ver §5) | — | — | Fontes gratuitas fiáveis são raras; scraping de sites (ex.: Forex Factory) viola os termos de uso — excluído. |
 

@@ -1,15 +1,18 @@
+import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { signed } from "@/lib/format";
 import type { BankStance, CurrencyMacro } from "@/lib/data/types";
 
-const STANCE_STYLE: Record<BankStance, string> = {
-  Restritivo: "text-up border-up-line",
+export const STANCE_STYLE: Record<BankStance, string> = {
+  Restritivo: "text-up border-up-line bg-up/10",
+  "Lig. restritivo": "text-up-soft border-up-line",
   Neutro: "text-ink-2 border-line-strong",
-  Expansionista: "text-down border-down-line",
+  "Lig. expansionista": "text-down-soft border-down-line",
+  Expansionista: "text-down border-down-line bg-down/10",
 };
 
 const HELP =
-  "Mede a força relativa de cada moeda segundo a macroeconomia. Soma duas partes: os DADOS (juros, inflação face à meta, emprego e surpresas económicas, calculados automaticamente) e a tua LEITURA do banco central (restritivo +1, neutro 0, expansionista −1). Não é um sinal de compra ou venda — é contexto.";
+  "Mede a força relativa de cada moeda segundo a macroeconomia. Soma duas partes: os DADOS (juro, inflação face à meta e evolução do emprego, calculados automaticamente com dados da OCDE) e a tua LEITURA do banco central (de restritivo +1 a expansionista −1, em 5 níveis). Não é um sinal de compra ou venda — é contexto.";
 
 export function CurrencyStrength({ currencies }: { currencies: (CurrencyMacro & { total: number })[] }) {
   return (
@@ -29,7 +32,7 @@ export function CurrencyStrength({ currencies }: { currencies: (CurrencyMacro & 
           <span className="text-right">forte +3</span>
         </div>
         <div className="w-12" />
-        <div className="w-[196px]" />
+        <div className="w-[220px]" />
       </div>
       <ol aria-labelledby="forca">
         {currencies.map((c) => {
@@ -51,16 +54,17 @@ export function CurrencyStrength({ currencies }: { currencies: (CurrencyMacro & 
               <span className={`num w-12 text-right font-semibold ${c.total >= 0 ? "text-up" : "text-down"}`}>
                 {signed(c.total)}
               </span>
-              <div className="flex flex-none gap-1.5 max-sm:w-full max-sm:pl-[62px] sm:w-[196px]">
+              <div className="flex flex-none gap-1.5 max-sm:w-full max-sm:pl-[62px] sm:w-[220px]">
                 <span className="num w-[90px] rounded bg-surface-2 px-2 py-0.5 text-center text-xs text-ink-2">Dados {signed(c.dataScore)}</span>
-                <span className={`w-[100px] rounded border px-2 py-px text-center text-xs ${STANCE_STYLE[c.stance]}`}>{c.stance}</span>
+                <span className={`w-[124px] rounded border px-2 py-px text-center text-xs ${STANCE_STYLE[c.stance]}`}>{c.stance}</span>
               </div>
             </li>
           );
         })}
       </ol>
-      <p className="text-xs text-faint">
-        Dados: juros, inflação vs. meta, emprego e surpresas económicas · Leitura do banco central revista após cada reunião
+      <p className="flex flex-wrap justify-between gap-2 text-xs text-faint">
+        <span>Dados: juro, inflação vs. meta e emprego (OCDE) · Leitura do banco central revista após cada reunião</span>
+        <Link href="/macro" className="text-up-soft hover:text-ink">Ver detalhe por moeda</Link>
       </p>
     </Card>
   );
