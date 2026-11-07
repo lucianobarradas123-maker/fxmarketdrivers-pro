@@ -51,7 +51,7 @@ que guarda as chaves API, faz cache e regista origem/hora de cada valor.
 | Necessidade | Fonte candidata | Origem | Frequência | Limitações |
 |---|---|---|---|---|
 | Velas diárias (ATR, tendência D1) | **Massive** (ex-Polygon.io) — testado nesta sessão | Agregação de cotações de mercado interbancário/fornecedores | Diária (barra fecha 00:00 UTC) | No plano testado: diárias ✅, horárias ❌. Preços não são os da IC Markets (diferenças pequenas). |
-| Velas H1/H4 (day trading) | Twelve Data (plano gratuito) — a testar | Agregador de fornecedores FX | Intradiária, atrasada | Limite diário e por minuto de pedidos no gratuito; confirmar condições atuais. |
+| Velas diárias e H1/H4 | **Twelve Data (plano gratuito) ✅ em uso** (D42) | Agregador de fornecedores FX | Intradiária, atrasada | Limite diário e por minuto de pedidos no gratuito; confirmar condições atuais. |
 | Alternativa intradiária | MetaTrader 5 (preços reais IC Markets) | A própria corretora | Tempo real | Exige MT5 + PC Windows ligado a enviar dados; mais complexo. Fase posterior. |
 | Inflação e desemprego (8 economias) | **OCDE — sdmx.oecd.org** ✅ em uso (D26) | Institutos de estatística nacionais, harmonizados pela OCDE | Mensal (NZ e desemprego CH trimestral); 1–3 meses de atraso de publicação | Sem chave. API recusa pedidos muito seguidos (o script espaça e repete). Desemprego suíço costuma vir mais atrasado. |
 | (alternativas avaliadas) | DBnomics; FRED | — | — | DBnomics: dados parados em abr./mai. 2026. FRED: exige chave na URL. |

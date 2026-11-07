@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 2 concluída · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 3 construída (falta a chave Twelve Data na Vercel) · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -54,6 +54,10 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D39 | Conta de trading em EUR; risco padrão 1% por operação | Resposta do utilizador (Etapa 3). |
 | D40 | Checklist da pré-operação: a favor do viés macro; tendência técnica confirma; stop ≥ 0,5× ATR; sem evento de alto impacto nas próximas 2h; R/R ≥ 1:1,5 | Aprovado pelo utilizador. |
 | D41 | Catálogo de eventos alargado com os que o utilizador inseriu à mão; eventos têm tipo (dado/decisão/discurso/política) | Pedido do utilizador; prepara a análise de discursos. |
+| D42 | Preços: Twelve Data (plano gratuito, 8 pedidos/min, 800/dia), barras diárias em cache durante horas | Escolha do utilizador (2a). Chave só no servidor. |
+| D43 | ATR(14) e tendência (preço vs. médias de 20 e 50 dias) calculados só com barras diárias completas de dias úteis | A Twelve Data devolve barras de fim de semana e do dia em curso, que baixariam o ATR. |
+| D44 | Lotes sempre arredondados PARA BAIXO a 0,01 (nunca arriscar mais do que a regra) | Gestão de risco. |
+| D45 | Saldo, % de risco e último par guardados no dispositivo (localStorage) | Conveniência; não é informação crítica. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -82,7 +86,9 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [ ] Serviço de email próprio (SMTP) antes do lançamento — o de teste do Supabase só envia 2/hora e para a equipa
 - [ ] Edição da leitura dos bancos centrais na app (tabela leituras_bancos já existe)
 - [ ] PROPOSTA em discussão: texto dos discursos + análise com IA (tom restritivo/expansionista, direção futura, dados a vigiar)
-- [ ] Etapa 3 — Pré-operação (decisão pendente: fonte de preços para valor do pip e ATR)
+- [x] Etapa 3 (construída): calculadora de lotes em EUR, R/R, stop vs. ATR, aviso de eventos, checklist automática com 5 critérios; 33 testes
+- [ ] Utilizador: acrescentar TWELVE_DATA_API_KEY (Secret) na Vercel e fazer Redeploy; testar a pré-operação
+- [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 
 ## Referências
