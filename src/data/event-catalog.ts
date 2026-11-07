@@ -4,13 +4,18 @@
  */
 import type { Currency, Impact } from "@/lib/data/types";
 
+/** Tipo de evento: os discursos terão campo próprio para o texto e análise (proposta em discussão). */
+export type EventKind = "dado" | "decisao" | "discurso" | "politica";
+
 export interface CatalogEvent {
   name: string;
   impact: Impact;
+  kind?: EventKind;
 }
 
-const rateDecision = (bank: string): CatalogEvent => ({ name: `Decisão de juros (${bank})`, impact: "alto" });
-const speech = (who: string): CatalogEvent => ({ name: `Discurso ${who}`, impact: "alto" });
+const rateDecision = (bank: string): CatalogEvent => ({ name: `Decisão de juros (${bank})`, impact: "alto", kind: "decisao" });
+const speech = (who: string, impact: Impact = "alto"): CatalogEvent => ({ name: `Discurso ${who}`, impact, kind: "discurso" });
+const elections: CatalogEvent = { name: "Eleições legislativas", impact: "alto", kind: "politica" };
 
 export const EVENT_CATALOG: Record<Currency, CatalogEvent[]> = {
   USD: [
@@ -26,6 +31,13 @@ export const EVENT_CATALOG: Record<Currency, CatalogEvent[]> = {
     { name: "PMI ISM industrial", impact: "médio" },
     { name: "PMI ISM serviços", impact: "médio" },
     { name: "Ofertas de emprego (JOLTS)", impact: "médio" },
+    { name: "IPP (preços no produtor)", impact: "alto" },
+    { name: "IPP subjacente", impact: "alto" },
+    { name: "Pedidos semanais de subsídio de desemprego", impact: "alto" },
+    speech("de membro do FOMC", "médio"),
+    { name: "Sentimento do consumidor (U. Michigan, preliminar)", impact: "médio" },
+    { name: "Expectativas de inflação (U. Michigan, preliminar)", impact: "médio" },
+    elections,
   ],
   EUR: [
     rateDecision("BCE"),
@@ -37,6 +49,8 @@ export const EVENT_CATALOG: Record<Currency, CatalogEvent[]> = {
     { name: "Taxa de desemprego", impact: "médio" },
     { name: "Índice Ifo (Alemanha)", impact: "médio" },
     { name: "Sentimento ZEW (Alemanha)", impact: "médio" },
+    speech("de membro do BCE", "médio"),
+    elections,
   ],
   GBP: [
     rateDecision("BoE"),
@@ -46,6 +60,9 @@ export const EVENT_CATALOG: Record<Currency, CatalogEvent[]> = {
     speech("do governador do BoE"),
     { name: "Vendas a retalho", impact: "médio" },
     { name: "PMI de serviços", impact: "médio" },
+    { name: "PIB trimestral (preliminar)", impact: "médio" },
+    speech("de membro do MPC", "médio"),
+    elections,
   ],
   JPY: [
     rateDecision("BoJ"),
@@ -54,12 +71,16 @@ export const EVENT_CATALOG: Record<Currency, CatalogEvent[]> = {
     { name: "IPC de Tóquio", impact: "médio" },
     { name: "PIB", impact: "médio" },
     { name: "Inquérito Tankan", impact: "médio" },
+    speech("de membro do BoJ", "médio"),
+    elections,
   ],
   CHF: [
     rateDecision("SNB"),
     speech("do presidente do SNB"),
     { name: "IPC (inflação)", impact: "médio" },
     { name: "PIB", impact: "médio" },
+    speech("de membro do SNB", "médio"),
+    elections,
   ],
   CAD: [
     rateDecision("BoC"),
@@ -69,6 +90,8 @@ export const EVENT_CATALOG: Record<Currency, CatalogEvent[]> = {
     { name: "PIB", impact: "médio" },
     { name: "Vendas a retalho", impact: "médio" },
     { name: "Ivey PMI", impact: "médio" },
+    speech("de membro do BoC", "médio"),
+    elections,
   ],
   AUD: [
     rateDecision("RBA"),
@@ -77,6 +100,8 @@ export const EVENT_CATALOG: Record<Currency, CatalogEvent[]> = {
     speech("da governadora do RBA"),
     { name: "PIB", impact: "médio" },
     { name: "Vendas a retalho", impact: "médio" },
+    speech("de membro do RBA", "médio"),
+    elections,
   ],
   NZD: [
     rateDecision("RBNZ"),
@@ -84,6 +109,8 @@ export const EVENT_CATALOG: Record<Currency, CatalogEvent[]> = {
     { name: "Emprego trimestral", impact: "alto" },
     speech("da governadora do RBNZ"),
     { name: "PIB", impact: "médio" },
+    speech("de membro do RBNZ", "médio"),
+    elections,
   ],
 };
 
