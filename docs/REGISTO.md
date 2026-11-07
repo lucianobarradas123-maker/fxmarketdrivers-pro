@@ -51,6 +51,9 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D36 | Mantido Cache Components do Next.js (partes com sessão carregam em Suspense) | Será obrigatório na próxima versão do Next.js. |
 | D37 | Alojamento: Vercel Hobby, publicação automática a partir do ramo main | Gratuito para uso pessoal. |
 | D38 | Variáveis do Supabase só no servidor (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY), tipo Secret na Vercel | A Vercel não aceita NEXT_PUBLIC_ como Secret; e a chave deixa de ir para o browser. |
+| D39 | Conta de trading em EUR; risco padrão 1% por operação | Resposta do utilizador (Etapa 3). |
+| D40 | Checklist da pré-operação: a favor do viés macro; tendência técnica confirma; stop ≥ 0,5× ATR; sem evento de alto impacto nas próximas 2h; R/R ≥ 1:1,5 | Aprovado pelo utilizador. |
+| D41 | Catálogo de eventos alargado com os que o utilizador inseriu à mão; eventos têm tipo (dado/decisão/discurso/política) | Pedido do utilizador; prepara a análise de discursos. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -78,6 +81,8 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Calendário testado pelo utilizador (2 eventos registados)
 - [ ] Serviço de email próprio (SMTP) antes do lançamento — o de teste do Supabase só envia 2/hora e para a equipa
 - [ ] Edição da leitura dos bancos centrais na app (tabela leituras_bancos já existe)
+- [ ] PROPOSTA em discussão: texto dos discursos + análise com IA (tom restritivo/expansionista, direção futura, dados a vigiar)
+- [ ] Etapa 3 — Pré-operação (decisão pendente: fonte de preços para valor do pip e ATR)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 
 ## Referências
