@@ -62,6 +62,7 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D47 | Valor do pip confirmado pelo utilizador contra o MetaTrader (IC Markets) | A diferença inicial era de cotação simulada (1,20). |
 | D48 | Sentimento do retalho: Myfxbook Community Outlook (API oficial) como filtro de confirmação em extremos (>70%), não como sinal isolado | Aprovado; utilizador já tem conta. |
 | D49 | Retalho: extremo a partir de 70% num lado; critério só conta quando há extremo; credenciais Myfxbook só na Vercel (palavra-passe exclusiva, sem contas reais ligadas) | Segurança e uso como filtro. |
+| D50 | Funções com cache que dependem de fontes externas nunca lançam erro: devolvem { error } com cache de minutos | Com Cache Components, um erro na pré-geração parte a build (aconteceu uma vez, corrigido). |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
