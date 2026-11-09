@@ -16,6 +16,7 @@ interface Market {
   vol: "baixa" | "normal" | "elevada";
   trend: "ascendente" | "descendente" | "lateral";
   macro: { base: number; quote: number; divergence: number; bias: "altista" | "baixista" | "neutro"; alignment: string };
+  risk: { index: number; label: string; pairBeta: number } | null;
   events: { time: string; currency: string; name: string }[];
   now: number;
   source: { prices: string; fetchedAt: string; macro: string };
@@ -155,6 +156,15 @@ export function PreTrade() {
     : [];
   const passed = checks.filter((c) => c.status === "ok").length;
 
+  // Exposição ao sentimento: comprar o par = comprar a base e vender a cotada.
+  const riskExposure = market?.risk ? (side === "compra" ? 1 : -1) * market.risk.pairBeta : 0;
+  const riskWarning =
+    market?.risk && riskExposure > 0 && market.risk.index < 45
+      ? `Estás do lado das moedas de risco num ambiente de ${market.risk.label.toLowerCase()} (${market.risk.index}/100).`
+      : market?.risk && riskExposure < 0 && market.risk.index > 55
+        ? `Estás do lado das moedas-refúgio num ambiente de ${market.risk.label.toLowerCase()} (${market.risk.index}/100).`
+        : null;
+
   return (
     <div className="flex flex-wrap items-start gap-4">
       <div className="flex min-w-0 flex-[1_1_380px] flex-col gap-4">
@@ -287,6 +297,12 @@ export function PreTrade() {
           ) : (
             <p className="text-muted">{loading ? "A avaliar…" : "—"}</p>
           )}
+          {riskWarning && (
+            <p className="rounded-md border border-down-line bg-down/10 px-3 py-2 text-[13px] text-down-soft">
+              <span className="font-semibold">Sentimento de risco: </span>
+              {riskWarning}
+            </p>
+          )}
           <p className="text-xs text-faint">Verificação do teu plano, não um sinal. A decisão de entrar é sempre tua.</p>
         </Card>
 
@@ -307,6 +323,10 @@ export function PreTrade() {
               <div className="flex flex-col">
                 <dt className="text-xs text-muted">Tendência diária</dt>
                 <dd>{market.trend}</dd>
+              </div>
+              <div className="flex flex-col">
+                <dt className="text-xs text-muted">Sentimento de risco</dt>
+                <dd>{market.risk ? `${market.risk.label} (${market.risk.index}/100)` : "indisponível"}</dd>
               </div>
               <div className="flex flex-col">
                 <dt className="text-xs text-muted">Macro vs. técnica</dt>

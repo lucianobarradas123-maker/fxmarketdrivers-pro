@@ -4,10 +4,11 @@ import { PairsList } from "@/components/dashboard/PairsList";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { Disclaimer, PageHeader, SampleNotice } from "@/components/ui/PageHeader";
 import { getDashboard } from "@/lib/dashboard";
+import { getRiskSentimentSafe } from "@/lib/sentiment-data";
 import { Today } from "@/components/ui/Today";
 
-export default function Home() {
-  const d = getDashboard();
+export default async function Home() {
+  const d = getDashboard(await getRiskSentimentSafe());
 
   return (
     <>

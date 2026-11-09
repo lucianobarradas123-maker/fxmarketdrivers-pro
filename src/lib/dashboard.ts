@@ -1,23 +1,25 @@
 /** Junta os dados e calcula o que o painel mostra. Macro = real; preços e técnica = exemplo (eventos vêm do calendário). */
 import { SAMPLE_PAIRS } from "@/lib/data/sample";
-import type { Currency, CurrencyMacro } from "@/lib/data/types";
+import type { Currency } from "@/lib/data/types";
 import { getMacro } from "@/lib/macro/build";
-import { alignment, biasFrom, pairDivergence, volLevel } from "@/lib/macro/score";
+import { alignment, biasFrom, volLevel } from "@/lib/macro/score";
+import type { RiskSentiment } from "@/lib/sentiment";
 
-export function getDashboard() {
-  // Macro: dados reais (OCDE + leitura manual dos bancos centrais) — Etapa 1.
-  const currencies = getMacro().map((c) => ({
+export function getDashboard(risk: RiskSentiment | null) {
+  // Macro: dados reais (OCDE + leitura manual dos bancos centrais + sentimento de risco).
+  const currencies = getMacro(risk).map((c) => ({
     code: c.code,
     bank: c.bank,
     dataScore: c.dataScore,
     stance: c.stance,
+    riskScore: c.riskScore,
     total: c.total,
   }));
-  const byCode = new Map<Currency, CurrencyMacro>(currencies.map((c) => [c.code, c]));
+  const totalOf = new Map<Currency, number>(currencies.map((c) => [c.code, c.total]));
 
   const pairs = SAMPLE_PAIRS.map((p) => {
     const [base, quote] = p.pair.split("/") as [Currency, Currency];
-    const divergence = pairDivergence(byCode.get(base)!, byCode.get(quote)!);
+    const divergence = Math.round((totalOf.get(base)! - totalOf.get(quote)!) * 10) / 10;
     const bias = biasFrom(divergence);
     return {
       ...p,
@@ -32,18 +34,12 @@ export function getDashboard() {
   const weakest = currencies[currencies.length - 1];
   const widest = [...pairs].sort((a, b) => Math.abs(b.divergence) - Math.abs(a.divergence))[0];
 
-  const avgRatio = pairs.reduce((s, p) => s + p.atrPips / p.atrAvg20Pips, 0) / pairs.length;
-  const marketVol = {
-    level: volLevel(avgRatio, 1),
-    changePct: Math.round((avgRatio - 1) * 100),
-  };
-
   return {
     currencies,
     pairs,
     strongest,
     weakest,
     widest,
-    marketVol,
+    risk,
   };
 }

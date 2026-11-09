@@ -12,7 +12,7 @@ export const STANCE_STYLE: Record<BankStance, string> = {
 };
 
 const HELP =
-  "Mede a força relativa de cada moeda segundo a macroeconomia. Soma duas partes: os DADOS (juro, inflação face à meta e evolução do emprego, calculados automaticamente com dados da OCDE) e a tua LEITURA do banco central (de restritivo +1 a expansionista −1, em 5 níveis). Não é um sinal de compra ou venda — é contexto.";
+  "Mede a força relativa de cada moeda segundo a macroeconomia. Soma três partes: os DADOS (juro, inflação face à meta e evolução do emprego, calculados automaticamente com dados da OCDE) e a tua LEITURA do banco central (de restritivo +1 a expansionista −1, em 5 níveis) e o SENTIMENTO DE RISCO (medo favorece JPY, CHF e USD; ganância favorece AUD, NZD e CAD; até ±0,5). Não é um sinal de compra ou venda — é contexto.";
 
 export function CurrencyStrength({ currencies }: { currencies: (CurrencyMacro & { total: number })[] }) {
   return (
@@ -22,7 +22,7 @@ export function CurrencyStrength({ currencies }: { currencies: (CurrencyMacro & 
         title="Força macro das moedas"
         tag="analise"
         help={HELP}
-        aside="Pontuação = dados (automático) + banco central (a tua leitura)"
+        aside="Pontuação = dados + banco central (a tua leitura) + sentimento de risco"
       />
       <div className="hidden items-center gap-x-3.5 sm:flex" aria-hidden="true">
         <div className="w-[110px]" />

@@ -7,6 +7,8 @@ import { dailyBars, eurRateFor } from "@/lib/market";
 import { currenciesOf, isPair } from "@/lib/pairs";
 import { atrAverage, atrPips, pipValueEur, trendOf } from "@/lib/risk";
 import { createClient } from "@/lib/supabase/server";
+import { RISK_BETA } from "@/lib/sentiment";
+import { getRiskSentimentSafe } from "@/lib/sentiment-data";
 
 export async function GET(request: NextRequest) {
   // Segunda barreira, além do proxy: exige sessão válida.
@@ -19,8 +21,13 @@ export async function GET(request: NextRequest) {
   const [base, quote] = currenciesOf(pair);
 
   try {
-    const [{ bars, fetchedAt }, eurRate, upcoming] = await Promise.all([dailyBars(pair), eurRateFor(pair), getUpcoming(1, "alto")]);
-    const macro = getMacro();
+    const [{ bars, fetchedAt }, eurRate, upcoming, risk] = await Promise.all([
+      dailyBars(pair),
+      eurRateFor(pair),
+      getUpcoming(1, "alto"),
+      getRiskSentimentSafe(),
+    ]);
+    const macro = getMacro(risk);
     const b = macro.find((c) => c.code === base)!;
     const q = macro.find((c) => c.code === quote)!;
     const divergence = Math.round((b.total - q.total) * 10) / 10;
@@ -41,11 +48,12 @@ export async function GET(request: NextRequest) {
       vol: volLevel(atr, atrAvg),
       trend,
       macro: { base: b.total, quote: q.total, divergence, bias, alignment: alignment(bias, trend) },
+      risk: risk ? { index: risk.index, label: risk.label, pairBeta: RISK_BETA[base] - RISK_BETA[quote] } : null,
       events: upcoming.events
         .filter((e) => e.moeda === base || e.moeda === quote)
         .map((e) => ({ time: e.data_hora, currency: e.moeda, name: e.nome })),
       now: upcoming.now,
-      source: { prices: "Twelve Data (barras diárias, atrasadas)", fetchedAt, macro: "OCDE + leitura manual" },
+      source: { prices: "Twelve Data (barras diárias, atrasadas)", fetchedAt, macro: "OCDE + leitura manual + sentimento de risco (CBOE, Twelve Data)" },
     });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Erro ao obter dados de mercado." }, { status: 502 });

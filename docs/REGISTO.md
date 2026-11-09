@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 3 construída (falta a chave Twelve Data na Vercel) · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 3 concluída; sentimento de risco publicado · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -58,6 +58,9 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D43 | ATR(14) e tendência (preço vs. médias de 20 e 50 dias) calculados só com barras diárias completas de dias úteis | A Twelve Data devolve barras de fim de semana e do dia em curso, que baixariam o ATR. |
 | D44 | Lotes sempre arredondados PARA BAIXO a 0,01 (nunca arriscar mais do que a regra) | Gestão de risco. |
 | D45 | Saldo, % de risco e último par guardados no dispositivo (localStorage) | Conveniência; não é informação crítica. |
+| D46 | Sentimento de risco próprio (0–100): VIX (CBOE) + S&P 500 (SPY) + AUD/JPY + ouro invertido, cada um vs. média de 50 dias; entra na força das moedas com peso até ±0,5 conforme a sensibilidade de cada moeda (AUD/NZD +1, CAD +0,5, GBP +0,25, EUR 0, USD −0,5, CHF/JPY −1) | Pedido do utilizador; CNN Fear & Greed é de ações e sem API oficial. |
+| D47 | Valor do pip confirmado pelo utilizador contra o MetaTrader (IC Markets) | A diferença inicial era de cotação simulada (1,20). |
+| D48 | Sentimento do retalho: Myfxbook Community Outlook (API oficial) como filtro de confirmação em extremos (>70%), não como sinal isolado | Aprovado; utilizador já tem conta. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -87,7 +90,10 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [ ] Edição da leitura dos bancos centrais na app (tabela leituras_bancos já existe)
 - [ ] PROPOSTA em discussão: texto dos discursos + análise com IA (tom restritivo/expansionista, direção futura, dados a vigiar)
 - [x] Etapa 3 (construída): calculadora de lotes em EUR, R/R, stop vs. ATR, aviso de eventos, checklist automática com 5 critérios; 33 testes
-- [ ] Utilizador: acrescentar TWELVE_DATA_API_KEY (Secret) na Vercel e fazer Redeploy; testar a pré-operação
+- [x] Pré-operação testada pelo utilizador; valor do pip confirmado contra o MT5
+- [x] Sentimento de risco (cartão no painel, painel no Macro, componente na força das moedas, aviso na pré-operação); 42 testes
+- [ ] Sentimento do retalho (Myfxbook) — próximo
+- [ ] Análise de discursos com IA (utilizador já tem chave da Anthropic)
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 

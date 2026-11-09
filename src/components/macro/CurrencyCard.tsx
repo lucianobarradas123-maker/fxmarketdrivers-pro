@@ -3,6 +3,7 @@ import { STANCE_STYLE } from "@/components/dashboard/CurrencyStrength";
 import { decimal, signed } from "@/lib/format";
 import type { getMacro } from "@/lib/macro/build";
 import { STANCE_LABEL, STANCE_POINTS } from "@/lib/macro/score";
+import { RISK_BETA } from "@/lib/sentiment";
 
 type C = ReturnType<typeof getMacro>[number];
 
@@ -53,7 +54,15 @@ const Stale = () => (
   </span>
 );
 
-export function CurrencyCard({ c, rank }: { c: C; rank: number }) {
+function riskRole(beta: number) {
+  if (beta >= 1) return "moeda de risco";
+  if (beta > 0) return "ligeiramente sensível ao risco";
+  if (beta === 0) return "neutra ao sentimento";
+  if (beta > -1) return "refúgio parcial";
+  return "moeda-refúgio";
+}
+
+export function CurrencyCard({ c, rank, riskLabel }: { c: C; rank: number; riskLabel: string | null }) {
   const unDelta = Math.round((c.macro.unemployment.value - c.macro.unemployment.sixMonthsAgo) * 10) / 10;
   return (
     <article aria-labelledby={`cur-${c.code}`} className="flex flex-col gap-4 rounded-xl border border-line bg-surface p-5">
@@ -132,6 +141,16 @@ export function CurrencyCard({ c, rank }: { c: C; rank: number }) {
           </div>
           <span className={`self-start rounded border px-2 py-px text-xs ${STANCE_STYLE[c.stance]}`}>{STANCE_LABEL[c.stance]}</span>
           <p className="text-[13px] text-ink-2">{c.reasoning}</p>
+        </div>
+        <div className="flex flex-col gap-1 rounded-lg bg-inset p-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-semibold text-ink-2">Sentimento de risco (automático)</span>
+            <span className={`num font-semibold ${c.riskScore > 0 ? "text-up" : c.riskScore < 0 ? "text-down" : "text-ink-2"}`}>{signed(c.riskScore)}</span>
+          </div>
+          <p className="text-xs text-muted">
+            {riskLabel ? `${riskLabel} no mercado · ` : "Indisponível · "}
+            {c.code} é {riskRole(RISK_BETA[c.code])}
+          </p>
         </div>
       </section>
 

@@ -30,7 +30,7 @@ interface SeriesResponse {
   values: { datetime: string; open: string; high: string; low: string; close: string }[];
 }
 
-/** Últimas N barras diárias, da mais antiga para a mais recente. */
+/** Últimas N barras diárias completas de dias úteis, da mais antiga para a mais recente (pares, ouro ou ETF). */
 export async function dailyBars(pair: string, count = 100): Promise<{ bars: Bar[]; fetchedAt: string }> {
   "use cache";
   cacheLife("hours");
