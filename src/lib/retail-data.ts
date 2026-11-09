@@ -41,11 +41,24 @@ export interface RetailData {
   fetchedAt: string;
 }
 
-export async function getRetailSentiment(): Promise<RetailData> {
+/**
+ * Nunca lança erro dentro da cache (com Cache Components isso interrompe a pré-geração das páginas):
+ * devolve { error } e, nesse caso, guarda só por minutos para voltar a tentar depressa.
+ */
+export async function getRetailSentiment(): Promise<RetailData | { error: string }> {
   "use cache";
-  cacheLife("hours");
   cacheTag("sentimento-retalho");
+  try {
+    const data = await fetchRetail();
+    cacheLife("hours");
+    return data;
+  } catch (e) {
+    cacheLife("minutes");
+    return { error: e instanceof Error ? e.message : "Erro desconhecido" };
+  }
+}
 
+async function fetchRetail(): Promise<RetailData> {
   const email = process.env.MYFXBOOK_EMAIL;
   const password = process.env.MYFXBOOK_PASSWORD;
   if (!email || !password) throw new Error("Faltam MYFXBOOK_EMAIL e MYFXBOOK_PASSWORD.");
@@ -84,10 +97,10 @@ export async function getRetailSentiment(): Promise<RetailData> {
 }
 
 export async function getRetailSentimentSafe(): Promise<RetailData | null> {
-  try {
-    return await getRetailSentiment();
-  } catch (e) {
-    console.error("Sentimento do retalho indisponível:", e instanceof Error ? e.message : e);
+  const r = await getRetailSentiment();
+  if ("error" in r) {
+    console.error("Sentimento do retalho indisponível:", r.error);
     return null;
   }
+  return r;
 }

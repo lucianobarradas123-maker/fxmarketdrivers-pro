@@ -35,6 +35,11 @@ export async function dailyBars(pair: string, count = 100): Promise<{ bars: Bar[
   "use cache";
   cacheLife("hours");
   cacheTag(`precos-${pair}`);
+  return fetchDailyBars(pair, count);
+}
+
+/** Versão sem cache própria (para usar dentro de outras funções com cache). */
+export async function fetchDailyBars(pair: string, count = 100): Promise<{ bars: Bar[]; fetchedAt: string }> {
   const data = await td<SeriesResponse>(`/time_series?symbol=${encodeURIComponent(pair)}&interval=1day&outputsize=${count}`);
   const now = new Date();
   const all = data.values
