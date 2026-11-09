@@ -61,6 +61,7 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D46 | Sentimento de risco próprio (0–100): VIX (CBOE) + S&P 500 (SPY) + AUD/JPY + ouro invertido, cada um vs. média de 50 dias; entra na força das moedas com peso até ±0,5 conforme a sensibilidade de cada moeda (AUD/NZD +1, CAD +0,5, GBP +0,25, EUR 0, USD −0,5, CHF/JPY −1) | Pedido do utilizador; CNN Fear & Greed é de ações e sem API oficial. |
 | D47 | Valor do pip confirmado pelo utilizador contra o MetaTrader (IC Markets) | A diferença inicial era de cotação simulada (1,20). |
 | D48 | Sentimento do retalho: Myfxbook Community Outlook (API oficial) como filtro de confirmação em extremos (>70%), não como sinal isolado | Aprovado; utilizador já tem conta. |
+| D49 | Retalho: extremo a partir de 70% num lado; critério só conta quando há extremo; credenciais Myfxbook só na Vercel (palavra-passe exclusiva, sem contas reais ligadas) | Segurança e uso como filtro. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -92,7 +93,8 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Etapa 3 (construída): calculadora de lotes em EUR, R/R, stop vs. ATR, aviso de eventos, checklist automática com 5 critérios; 33 testes
 - [x] Pré-operação testada pelo utilizador; valor do pip confirmado contra o MT5
 - [x] Sentimento de risco (cartão no painel, painel no Macro, componente na força das moedas, aviso na pré-operação); 42 testes
-- [ ] Sentimento do retalho (Myfxbook) — próximo
+- [x] Sentimento do retalho (Myfxbook): código feito (login → outlook → logout, cache 1h); 6.º critério opcional na pré-operação; linha "Retalho" nos pares em destaque; 48 testes
+- [ ] Utilizador: criar MYFXBOOK_EMAIL e MYFXBOOK_PASSWORD (Secret) na Vercel + Redeploy; confirmar dados no site
 - [ ] Análise de discursos com IA (utilizador já tem chave da Anthropic)
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5

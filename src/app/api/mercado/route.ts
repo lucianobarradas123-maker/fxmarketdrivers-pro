@@ -9,6 +9,8 @@ import { atrAverage, atrPips, pipValueEur, trendOf } from "@/lib/risk";
 import { createClient } from "@/lib/supabase/server";
 import { RISK_BETA } from "@/lib/sentiment";
 import { getRiskSentimentSafe } from "@/lib/sentiment-data";
+import { getRetailSentimentSafe } from "@/lib/retail-data";
+import { readRetail } from "@/lib/retail";
 
 export async function GET(request: NextRequest) {
   // Segunda barreira, além do proxy: exige sessão válida.
@@ -21,12 +23,14 @@ export async function GET(request: NextRequest) {
   const [base, quote] = currenciesOf(pair);
 
   try {
-    const [{ bars, fetchedAt }, eurRate, upcoming, risk] = await Promise.all([
+    const [{ bars, fetchedAt }, eurRate, upcoming, risk, retail] = await Promise.all([
       dailyBars(pair),
       eurRateFor(pair),
       getUpcoming(1, "alto"),
       getRiskSentimentSafe(),
+      getRetailSentimentSafe(),
     ]);
+    const retailPair = retail?.pairs[pair] ?? null;
     const macro = getMacro(risk);
     const b = macro.find((c) => c.code === base)!;
     const q = macro.find((c) => c.code === quote)!;
@@ -48,6 +52,7 @@ export async function GET(request: NextRequest) {
       vol: volLevel(atr, atrAvg),
       trend,
       macro: { base: b.total, quote: q.total, divergence, bias, alignment: alignment(bias, trend) },
+      retail: retailPair ? { ...retailPair, read: readRetail(retailPair), fetchedAt: retail!.fetchedAt } : null,
       risk: risk ? { index: risk.index, label: risk.label, pairBeta: RISK_BETA[base] - RISK_BETA[quote] } : null,
       events: upcoming.events
         .filter((e) => e.moeda === base || e.moeda === quote)

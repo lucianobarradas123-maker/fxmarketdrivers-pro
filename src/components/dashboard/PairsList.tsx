@@ -34,6 +34,9 @@ export function PairsList({ pairs }: { pairs: Pair[] }) {
                   Macro <span className={p.bias === "altista" ? "text-up" : p.bias === "baixista" ? "text-down" : ""}>{p.bias}</span> ·
                   Técnica {TREND[p.trend]}
                 </span>
+                {p.retail && (
+                  <span className={`text-xs ${p.retail.extreme ? "text-down-soft" : "text-faint"}`}>Retalho: {p.retail.text}</span>
+                )}
                 <span className="text-xs text-faint">
                   Volatilidade <span className={VOL_STYLE[p.vol]}>{p.vol}</span> · <span className="num">ATR {p.atrPips} pips</span>
                 </span>

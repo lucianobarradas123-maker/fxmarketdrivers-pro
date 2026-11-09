@@ -17,12 +17,17 @@ interface Market {
   trend: "ascendente" | "descendente" | "lateral";
   macro: { base: number; quote: number; divergence: number; bias: "altista" | "baixista" | "neutro"; alignment: string };
   risk: { index: number; label: string; pairBeta: number } | null;
+  retail: {
+    longPct: number;
+    shortPct: number;
+    read: { extreme: boolean; majority: string; pct: number; contrarian?: "compra" | "venda" };
+  } | null;
   events: { time: string; currency: string; name: string }[];
   now: number;
   source: { prices: string; fetchedAt: string; macro: string };
 }
 
-type Status = "ok" | "alerta" | "falha" | "pendente";
+type Status = "ok" | "alerta" | "falha" | "pendente" | "info";
 const STORAGE = "fxmd-pre-operacao";
 
 // Regras do plano (D40)
@@ -54,9 +59,10 @@ const STATUS_STYLE: Record<Status, string> = {
   alerta: "border border-down text-down",
   falha: "bg-down text-bg",
   pendente: "border border-line-strong text-faint",
+  info: "border border-line-strong text-ink-2",
 };
-const STATUS_ICON: Record<Status, string> = { ok: "✓", alerta: "!", falha: "✕", pendente: "·" };
-const STATUS_LABEL: Record<Status, string> = { ok: "cumprido", alerta: "atenção", falha: "não cumprido", pendente: "por avaliar" };
+const STATUS_ICON: Record<Status, string> = { ok: "✓", alerta: "!", falha: "✕", pendente: "·", info: "–" };
+const STATUS_LABEL: Record<Status, string> = { ok: "cumprido", alerta: "atenção", falha: "não cumprido", pendente: "por avaliar", info: "não se aplica" };
 
 export function PreTrade() {
   const [pair, setPair] = useState("EUR/USD");
@@ -154,7 +160,23 @@ export function PreTrade() {
         },
       ]
     : [];
-  const passed = checks.filter((c) => c.status === "ok").length;
+  // 6.º critério (opcional, D48): só conta quando o retalho está num extremo.
+  if (market) {
+    const r = market.retail;
+    checks.push(
+      !r
+        ? { label: "Não estás com a maioria do retalho (extremos)", status: "info", detail: "Sentimento do retalho indisponível" }
+        : !r.read.extreme
+          ? { label: "Não estás com a maioria do retalho (extremos)", status: "info", detail: `Sem extremo: ${r.longPct}% compradores / ${r.shortPct}% vendedores` }
+          : {
+              label: "Não estás com a maioria do retalho (extremos)",
+              status: r.read.contrarian === side ? "ok" : "falha",
+              detail: `${r.read.pct}% do retalho em ${r.read.majority} · contrário: ${r.read.contrarian}`,
+            },
+    );
+  }
+  const applicable = checks.filter((c) => c.status !== "info");
+  const passed = applicable.filter((c) => c.status === "ok").length;
 
   // Exposição ao sentimento: comprar o par = comprar a base e vender a cotada.
   const riskExposure = market?.risk ? (side === "compra" ? 1 : -1) * market.risk.pairBeta : 0;
@@ -276,7 +298,7 @@ export function PreTrade() {
         )}
 
         <Card className="flex flex-col gap-3">
-          <CardHeader id="plano" title="O teu plano" tag="analise" aside={market ? `${passed} de ${checks.length} cumpridos` : undefined} />
+          <CardHeader id="plano" title="O teu plano" tag="analise" aside={market ? `${passed} de ${applicable.length} cumpridos` : undefined} />
           {market ? (
             <ul className="flex flex-col gap-2.5">
               {checks.map((c) => (
@@ -325,6 +347,10 @@ export function PreTrade() {
                 <dd>{market.trend}</dd>
               </div>
               <div className="flex flex-col">
+                <dt className="text-xs text-muted">Retalho (Myfxbook)</dt>
+                <dd>{market.retail ? `${market.retail.longPct}% compra · ${market.retail.shortPct}% venda` : "indisponível"}</dd>
+              </div>
+              <div className="flex flex-col">
                 <dt className="text-xs text-muted">Sentimento de risco</dt>
                 <dd>{market.risk ? `${market.risk.label} (${market.risk.index}/100)` : "indisponível"}</dd>
               </div>
@@ -336,7 +362,7 @@ export function PreTrade() {
               </div>
             </dl>
             <p className="text-xs text-faint">
-              Preços: {market.source.prices}, último dia {market.lastBar}. Não são os preços da tua corretora. Macro: {market.source.macro}.
+              Preços: {market.source.prices}, último dia {market.lastBar}. Não são os preços da tua corretora. Macro: {market.source.macro}. Retalho: Myfxbook (1 h de cache).
             </p>
           </Card>
         )}

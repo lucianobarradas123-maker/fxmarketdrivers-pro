@@ -4,8 +4,10 @@ import type { Currency } from "@/lib/data/types";
 import { getMacro } from "@/lib/macro/build";
 import { alignment, biasFrom, volLevel } from "@/lib/macro/score";
 import type { RiskSentiment } from "@/lib/sentiment";
+import { readRetail, retailText } from "@/lib/retail";
+import type { RetailData } from "@/lib/retail-data";
 
-export function getDashboard(risk: RiskSentiment | null) {
+export function getDashboard(risk: RiskSentiment | null, retail: RetailData | null = null) {
   // Macro: dados reais (OCDE + leitura manual dos bancos centrais + sentimento de risco).
   const currencies = getMacro(risk).map((c) => ({
     code: c.code,
@@ -27,6 +29,12 @@ export function getDashboard(risk: RiskSentiment | null) {
       bias,
       alignment: alignment(bias, p.trend),
       vol: volLevel(p.atrPips, p.atrAvg20Pips),
+      retail: (() => {
+        const r = retail?.pairs[p.pair];
+        if (!r) return null;
+        const read = readRetail(r);
+        return { text: retailText(read), extreme: read.extreme };
+      })(),
     };
   });
 

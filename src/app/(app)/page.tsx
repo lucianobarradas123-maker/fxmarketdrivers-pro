@@ -5,10 +5,12 @@ import { StatCards } from "@/components/dashboard/StatCards";
 import { Disclaimer, PageHeader, SampleNotice } from "@/components/ui/PageHeader";
 import { getDashboard } from "@/lib/dashboard";
 import { getRiskSentimentSafe } from "@/lib/sentiment-data";
+import { getRetailSentimentSafe } from "@/lib/retail-data";
 import { Today } from "@/components/ui/Today";
 
 export default async function Home() {
-  const d = getDashboard(await getRiskSentimentSafe());
+  const [risk, retail] = await Promise.all([getRiskSentimentSafe(), getRetailSentimentSafe()]);
+  const d = getDashboard(risk, retail);
 
   return (
     <>
