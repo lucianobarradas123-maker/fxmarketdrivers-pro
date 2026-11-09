@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Link from "next/link";
+import { STANCE_STYLE } from "@/components/dashboard/CurrencyStrength";
 import { Card, CardHeader } from "@/components/ui/Card";
+import type { StoredAnalysis } from "@/lib/speech/schema";
 import { Countdown } from "@/components/ui/Countdown";
 import { Disclaimer, PageHeader } from "@/components/ui/PageHeader";
 import { getEvents, type EventRow } from "@/lib/events";
@@ -17,12 +20,29 @@ const IMPACT_STYLE = {
   baixo: "text-faint border-line-soft",
 } as const;
 
+/** Eventos com texto para analisar: discursos, decisões, conferências, atas, testemunhos. */
+const ANALYZABLE = /discurso|decis|confer|speak|statement|comunicado|minutes|\bata\b|testemunho|testimony|press/i;
+
 function EventItem({ e, past }: { e: EventRow; past: boolean }) {
+  const a = e.analise as StoredAnalysis | null;
   return (
     <li className={`flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line-soft py-3 ${past ? "opacity-75" : ""}`}>
       <span className="num w-12 text-[13px] text-muted">{formatTime(e.data_hora)}</span>
       <span className="num w-10 text-[13px] font-semibold">{e.moeda}</span>
-      <span className="min-w-40 flex-[1_1_220px]">{e.nome}</span>
+      <span className="flex min-w-40 flex-[1_1_220px] flex-col gap-0.5">
+        <span>{e.nome}</span>
+        {(a || ANALYZABLE.test(e.nome)) && (
+          <Link href={`/calendario/${e.id}`} className="flex items-center gap-2 text-xs text-up-soft hover:text-ink">
+            {a ? (
+              <>
+                <span className={`rounded border px-1.5 text-[11px] ${STANCE_STYLE[a.tom]}`}>{a.tom}</span> Ver análise
+              </>
+            ) : (
+              "Texto e análise com IA →"
+            )}
+          </Link>
+        )}
+      </span>
       <span className={`rounded border px-2 py-px text-[11px] font-semibold uppercase ${IMPACT_STYLE[e.impacto]}`}>{e.impacto}</span>
       <dl className="num flex gap-4 text-[13px]">
         <div className="flex flex-col">

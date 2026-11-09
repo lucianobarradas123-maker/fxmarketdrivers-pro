@@ -8,7 +8,11 @@ import { NAV_ITEMS, isActive } from "./nav-items";
 import { MACRO_META } from "@/lib/macro/meta";
 
 export function TopBar() {
-  const pathname = usePathname();
+  return <TopBarView pathname={usePathname()} />;
+}
+
+/** Versão sem hooks: também usada como conteúdo provisório enquanto o endereço da página não é conhecido. */
+export function TopBarView({ pathname }: { pathname: string }) {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-bar/95 backdrop-blur">
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-7 gap-y-3 px-4 py-3 sm:px-8">

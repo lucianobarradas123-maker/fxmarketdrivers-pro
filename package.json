@@ -13,6 +13,7 @@
     "db:test": "NODE_USE_ENV_PROXY=1 node scripts/db-test-rls.mts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.0",
     "next": "16.4.5",

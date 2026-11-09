@@ -13,9 +13,10 @@ export interface EventRow {
   anterior: string | null;
   atual: string | null;
   notas: string | null;
+  analise: unknown | null;
 }
 
-const COLS = "id, data_hora, moeda, nome, impacto, previsao, anterior, atual, notas";
+const COLS = "id, data_hora, moeda, nome, impacto, previsao, anterior, atual, notas, analise";
 
 /** Eventos de N dias atrás até M dias à frente (a base de dados só devolve os do utilizador com sessão). */
 export async function getEvents(daysBack: number, daysAhead: number): Promise<{ now: number; events: EventRow[] }> {

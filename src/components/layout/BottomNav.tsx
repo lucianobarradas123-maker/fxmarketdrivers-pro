@@ -7,7 +7,10 @@ import { NAV_ITEMS, isActive } from "./nav-items";
 
 /** Barra de navegação inferior — só no telemóvel. */
 export function BottomNav() {
-  const pathname = usePathname();
+  return <BottomNavView pathname={usePathname()} />;
+}
+
+export function BottomNavView({ pathname }: { pathname: string }) {
   return (
     <nav
       aria-label="Navegação"

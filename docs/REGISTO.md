@@ -63,6 +63,9 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D48 | Sentimento do retalho: Myfxbook Community Outlook (API oficial) como filtro de confirmação em extremos (>70%), não como sinal isolado | Aprovado; utilizador já tem conta. |
 | D49 | Retalho: extremo a partir de 70% num lado; critério só conta quando há extremo; credenciais Myfxbook só na Vercel (palavra-passe exclusiva, sem contas reais ligadas) | Segurança e uso como filtro. |
 | D50 | Funções com cache que dependem de fontes externas nunca lançam erro: devolvem { error } com cache de minutos | Com Cache Components, um erro na pré-geração parte a build (aconteceu uma vez, corrigido). |
+| D51 | Análise de discursos: texto colado ou link (https público; HTML ou PDF), Claude Opus 5.5, esforço "high", resposta estruturada validada, fallbacks "default"; guarda texto, link e análise no evento (RLS) | Pedido do utilizador; custo ~0,05–0,15 €/análise. |
+| D52 | Citações da IA verificadas automaticamente contra o texto (✓ encontrada / ! não encontrada / PDF não verificável) | Reduz o risco de interpretações sem base. |
+| D53 | Links lidos pelo servidor só se forem https públicos (sem IPs, localhost ou redes internas), máx. 3 redireções e 10 MB | Segurança (evita uso do servidor contra endereços internos). |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -96,7 +99,10 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Sentimento de risco (cartão no painel, painel no Macro, componente na força das moedas, aviso na pré-operação); 42 testes
 - [x] Sentimento do retalho (Myfxbook): código feito (login → outlook → logout, cache 1h); 6.º critério opcional na pré-operação; linha "Retalho" nos pares em destaque; 48 testes
 - [ ] Utilizador: criar MYFXBOOK_EMAIL e MYFXBOOK_PASSWORD (Secret) na Vercel + Redeploy; confirmar dados no site
-- [ ] Análise de discursos com IA (utilizador já tem chave da Anthropic)
+- [x] Sentimento do retalho confirmado pelo utilizador (EUR/USD 85% comprados = Myfxbook)
+- [x] Análise de discursos com IA (construída): página por evento (/calendario/[id]) com texto ou link (HTML/PDF), Claude Opus 5.5 com respostas estruturadas e reserva automática, verificação das citações, sugestão de leitura do BC; 55 testes
+- [ ] Utilizador: ANTHROPIC_API_KEY (Secret) na Vercel + limite de gasto na consola Anthropic; testar com um discurso real
+- [ ] Edição da leitura dos bancos centrais na app (aplicar sugestões da IA)
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 
