@@ -3,13 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { CENTRAL_BANKS } from "@/data/central-banks";
-import type { Currency } from "@/lib/data/types";
-import { analyzeSpeech, fetchSource, MAX_CHARS, MODEL, type Source } from "@/lib/speech/analyze";
+import type { BankStance, Currency } from "@/lib/data/types";
+import { analyzeSpeech, CONFIRM_ABOVE_USD, estimateCostUsd, fetchSource, MAX_CHARS, MODEL, type Source } from "@/lib/speech/analyze";
 import type { StoredAnalysis } from "@/lib/speech/schema";
 import { isSafeUrl } from "@/lib/speech/text";
 import { createClient } from "@/lib/supabase/server";
 
-export type AnalyzeState = { error?: string; ok?: number } | undefined;
+export type AnalyzeState = { error?: string; ok?: number; confirm?: { chars: number; usd: number } } | undefined;
 
 const input = z.object({
   id: z.uuid(),
@@ -39,6 +39,10 @@ export async function analyzeEvent(_: AnalyzeState, form: FormData): Promise<Ana
   if (error || !ev) return { error: "Evento não encontrado." };
 
   const bank = CENTRAL_BANKS.find((b) => b.code === (ev.moeda as Currency))!;
+  // A leitura editada na app (se existir) prevalece sobre a inicial.
+  const { data: own } = await supabase.from("leituras_bancos").select("postura, justificacao").eq("moeda", ev.moeda).maybeSingle();
+  const stance = (own?.postura as BankStance | undefined) ?? bank.stance;
+  const reasoning = own?.justificacao ?? bank.reasoning;
   const { data: prev } = await supabase
     .from("eventos")
     .select("data_hora, nome, analise")
@@ -55,6 +59,12 @@ export async function analyzeEvent(_: AnalyzeState, form: FormData): Promise<Ana
     return { error: e instanceof Error ? e.message : "Não foi possível ler o link." };
   }
 
+  // Textos longos: mostra o custo estimado e pede confirmação antes de gastar créditos.
+  if (source.kind === "text" && form.get("confirmar") !== "1") {
+    const usd = estimateCostUsd(source.text.length);
+    if (usd > CONFIRM_ABOVE_USD) return { confirm: { chars: source.text.length, usd } };
+  }
+
   let analysis: StoredAnalysis;
   try {
     analysis = await analyzeSpeech(source, {
@@ -62,8 +72,8 @@ export async function analyzeEvent(_: AnalyzeState, form: FormData): Promise<Ana
       bank: bank.bank,
       eventName: ev.nome,
       eventDate: ev.data_hora.slice(0, 10),
-      currentStance: bank.stance,
-      currentReasoning: bank.reasoning,
+      currentStance: stance,
+      currentReasoning: reasoning,
       previous: (prev ?? []).map((p) => {
         const a = p.analise as StoredAnalysis;
         return { date: String(p.data_hora).slice(0, 10), name: p.nome, tom: a.tom, resumo: a.resumo };

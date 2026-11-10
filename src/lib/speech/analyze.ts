@@ -14,6 +14,8 @@ export const MODEL = "claude-opus-5-5";
 const MAX_BYTES = 10 * 1024 * 1024;
 export const MAX_CHARS = 200_000;
 
+export { CONFIRM_ABOVE_USD, estimateCostUsd } from "./text";
+
 export type Source = { kind: "text"; text: string } | { kind: "pdf"; base64: string };
 
 /** Lê o conteúdo de um link público (HTML, texto ou PDF), seguindo no máximo 3 redireções seguras. */

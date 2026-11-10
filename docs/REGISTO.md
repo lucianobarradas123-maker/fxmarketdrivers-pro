@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 3 concluída; sentimento de risco publicado · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapas 1–3 + sentimento + IA concluídas; próxima: Etapa 4 (Diário) · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -66,6 +66,9 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D51 | Análise de discursos: texto colado ou link (https público; HTML ou PDF), Claude Opus 5.5, esforço "high", resposta estruturada validada, fallbacks "default"; guarda texto, link e análise no evento (RLS) | Pedido do utilizador; custo ~0,05–0,15 €/análise. |
 | D52 | Citações da IA verificadas automaticamente contra o texto (✓ encontrada / ! não encontrada / PDF não verificável) | Reduz o risco de interpretações sem base. |
 | D53 | Links lidos pelo servidor só se forem https públicos (sem IPs, localhost ou redes internas), máx. 3 redireções e 10 MB | Segurança (evita uso do servidor contra endereços internos). |
+| D54 | Leitura do BC: a editada na app (tabela leituras_bancos) prevalece sobre a inicial do ficheiro; a IA só sugere, o utilizador aplica | Princípio híbrido (D11). |
+| D55 | Pares em destaque = 5 pares de maior divergência macro, máx. 2 aparições por moeda; preços num único pedido em lote | Variedade e limite de 8 pedidos/min da Twelve Data. |
+| D56 | Confirmação obrigatória quando a análise de um texto custar > 0,15 $ (estimativa ~3,3 caracteres/token) | Evitar surpresas de custo (página inteira custou 0,33 $). |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -101,8 +104,12 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [ ] Utilizador: criar MYFXBOOK_EMAIL e MYFXBOOK_PASSWORD (Secret) na Vercel + Redeploy; confirmar dados no site
 - [x] Sentimento do retalho confirmado pelo utilizador (EUR/USD 85% comprados = Myfxbook)
 - [x] Análise de discursos com IA (construída): página por evento (/calendario/[id]) com texto ou link (HTML/PDF), Claude Opus 5.5 com respostas estruturadas e reserva automática, verificação das citações, sugestão de leitura do BC; 55 testes
-- [ ] Utilizador: ANTHROPIC_API_KEY (Secret) na Vercel + limite de gasto na consola Anthropic; testar com um discurso real
-- [ ] Edição da leitura dos bancos centrais na app (aplicar sugestões da IA)
+- [x] Análise de discursos testada pelo utilizador (2 análises GBP, todas as citações verificadas; 0,06 $ e 0,33 $)
+- [x] Leituras dos bancos centrais editáveis na app (ecrã Macro) + botão "Aplicar sugestão" nas análises; pré-operação e IA usam a leitura editada
+- [x] Pares em destaque com dados reais: 5 pares de maior divergência (máx. 2 por moeda), tendência/ATR reais, link para a pré-operação
+- [x] Aviso de custo antes de analisar textos longos (> 0,15 $ estimado)
+- [ ] Etapa 4 — Diário de operações (próximo)
+- [ ] Cartão "Risco por operação" do painel ainda usa saldo de exemplo (passa a usar o do diário na Etapa 4)
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 

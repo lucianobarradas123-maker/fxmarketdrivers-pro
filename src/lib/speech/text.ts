@@ -64,3 +64,10 @@ export function quoteAppears(quote: string, text: string): boolean {
   }
   return true;
 }
+
+/** Custo estimado (USD) de analisar um texto: ~3,3 caracteres por token, ~4000 tokens de resposta (Opus 5.5: 4 $/20 $ por milhão). */
+export function estimateCostUsd(chars: number): number {
+  return (chars / 3.3) * (4 / 1_000_000) + 4000 * (20 / 1_000_000);
+}
+/** Acima deste custo estimado, pede confirmação antes de analisar. */
+export const CONFIRM_ABOVE_USD = 0.15;

@@ -4,6 +4,7 @@ import { decimal, signed } from "@/lib/format";
 import type { getMacro } from "@/lib/macro/build";
 import { STANCE_LABEL, STANCE_POINTS } from "@/lib/macro/score";
 import { RISK_BETA } from "@/lib/sentiment";
+import { ReadingEditor } from "./ReadingEditor";
 
 type C = ReturnType<typeof getMacro>[number];
 
@@ -141,6 +142,10 @@ export function CurrencyCard({ c, rank, riskLabel }: { c: C; rank: number; riskL
           </div>
           <span className={`self-start rounded border px-2 py-px text-xs ${STANCE_STYLE[c.stance]}`}>{STANCE_LABEL[c.stance]}</span>
           <p className="text-[13px] text-ink-2">{c.reasoning}</p>
+          <p className="text-[11px] text-faint">
+            Revista a {date(c.reviewedAt)} · {c.editedInApp ? "editada por ti na app" : "leitura inicial"}
+          </p>
+          <ReadingEditor code={c.code} bank={c.bank} stance={c.stance} reasoning={c.reasoning} />
         </div>
         <div className="flex flex-col gap-1 rounded-lg bg-inset p-3">
           <div className="flex items-center justify-between gap-2">

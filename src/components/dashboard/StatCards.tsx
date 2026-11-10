@@ -104,7 +104,7 @@ export function StatCards({ d }: { d: D }) {
           <span className="num font-semibold text-down">{signed(d.weakest.total)}</span>
         </p>
       </Stat>
-      <Stat label={<Label>Maior divergência macro</Label>} note={`Técnica: ${d.widest.trend} · ${d.widest.alignment.toLowerCase()}`}>
+      <Stat label={<Label>Maior divergência macro</Label>} note={d.widest.trend && d.widest.alignment ? `Técnica: ${d.widest.trend} · ${d.widest.alignment.toLowerCase()}` : "Técnica indisponível de momento"}>
         <p className="flex items-baseline gap-2.5">
           <span className="num text-[28px] font-semibold">{d.widest.pair}</span>
           <span className="num text-ink-2">{decimal(Math.abs(d.widest.divergence))}</span>

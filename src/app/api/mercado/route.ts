@@ -2,6 +2,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getUpcoming } from "@/lib/events";
 import { getMacro } from "@/lib/macro/build";
+import { getReadings } from "@/lib/macro/readings";
 import { alignment, biasFrom, volLevel } from "@/lib/macro/score";
 import { dailyBars, eurRateFor } from "@/lib/market";
 import { currenciesOf, isPair } from "@/lib/pairs";
@@ -23,15 +24,16 @@ export async function GET(request: NextRequest) {
   const [base, quote] = currenciesOf(pair);
 
   try {
-    const [{ bars, fetchedAt }, eurRate, upcoming, risk, retail] = await Promise.all([
+    const [{ bars, fetchedAt }, eurRate, upcoming, risk, retail, readings] = await Promise.all([
       dailyBars(pair),
       eurRateFor(pair),
       getUpcoming(1, "alto"),
       getRiskSentimentSafe(),
       getRetailSentimentSafe(),
+      getReadings(),
     ]);
     const retailPair = retail?.pairs[pair] ?? null;
-    const macro = getMacro(risk);
+    const macro = getMacro(risk, readings);
     const b = macro.find((c) => c.code === base)!;
     const q = macro.find((c) => c.code === quote)!;
     const divergence = Math.round((b.total - q.total) * 10) / 10;
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
         .filter((e) => e.moeda === base || e.moeda === quote)
         .map((e) => ({ time: e.data_hora, currency: e.moeda, name: e.nome })),
       now: upcoming.now,
-      source: { prices: "Twelve Data (barras diárias, atrasadas)", fetchedAt, macro: "OCDE + leitura manual + sentimento de risco (CBOE, Twelve Data)" },
+      source: { prices: "Twelve Data (barras diárias, atrasadas)", fetchedAt, macro: "OCDE + as tuas leituras dos bancos centrais + sentimento de risco" },
     });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Erro ao obter dados de mercado." }, { status: 502 });

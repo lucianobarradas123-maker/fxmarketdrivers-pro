@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { htmlToText, isSafeUrl, quoteAppears } from "./text";
+import { CONFIRM_ABOVE_USD, estimateCostUsd, htmlToText, isSafeUrl, quoteAppears } from "./text";
 
 describe("links seguros", () => {
   it("aceita https públicos", () => {
@@ -48,5 +48,15 @@ describe("verificação de citações", () => {
   it("rejeita frases inventadas ou demasiado curtas", () => {
     expect(quoteAppears("We will cut rates next month", text)).toBe(false);
     expect(quoteAppears("too high", text)).toBe(false);
+  });
+});
+
+describe("estimativa de custo", () => {
+  it("texto normal (8 mil caracteres) não pede confirmação", () => {
+    expect(estimateCostUsd(8_000)).toBeLessThan(CONFIRM_ABOVE_USD);
+  });
+  it("página inteira (175 mil caracteres) pede confirmação, ≈ 0,29 $", () => {
+    expect(estimateCostUsd(175_000)).toBeGreaterThan(CONFIRM_ABOVE_USD);
+    expect(estimateCostUsd(175_000)).toBeCloseTo(0.29, 1);
   });
 });

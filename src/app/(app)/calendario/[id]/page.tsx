@@ -11,12 +11,14 @@ import type { StoredAnalysis } from "@/lib/speech/schema";
 import { createClient } from "@/lib/supabase/server";
 import { formatDay, formatTime } from "@/lib/time";
 import { AnalysisForm } from "./AnalysisForm";
+import { ApplySuggestion } from "./ApplySuggestion";
+import type { BankStance, Currency } from "@/lib/data/types";
 
 export const metadata: Metadata = { title: "Evento" };
 // A análise pode demorar até ~1 minuto.
 export const maxDuration = 120;
 
-function AnalysisView({ a, when, model }: { a: StoredAnalysis; when: string; model: string | null }) {
+function AnalysisView({ a, when, model, code, current }: { a: StoredAnalysis; when: string; model: string | null; code: Currency; current: BankStance }) {
   const usd = (a.custo_tokens.entrada * 4 + a.custo_tokens.saida * 20) / 1_000_000;
   return (
     <Card className="fade-in flex flex-col gap-5">
@@ -84,7 +86,12 @@ function AnalysisView({ a, when, model }: { a: StoredAnalysis; when: string; mod
           <p className="text-[14px]">
             Passar para <strong>{STANCE_LABEL[a.sugestao_leitura.postura]}</strong>: {a.sugestao_leitura.justificacao}
           </p>
-          <p className="text-xs text-faint">É uma sugestão. A decisão é tua — a edição da leitura na app chega no próximo passo.</p>
+          <ApplySuggestion
+            code={code}
+            stance={a.sugestao_leitura.postura}
+            current={current}
+            reasoning={`Sugestão IA (${when.split(" ").slice(0, -1).join(" ")}): ${a.sugestao_leitura.justificacao}`}
+          />
         </section>
       )}
 
@@ -107,6 +114,8 @@ async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
     .maybeSingle();
   if (!e) notFound();
   const bank = CENTRAL_BANKS.find((b) => b.code === e.moeda);
+  const { data: own } = await supabase.from("leituras_bancos").select("postura").eq("moeda", e.moeda).maybeSingle();
+  const currentStance = ((own?.postura as BankStance | undefined) ?? bank?.stance ?? "Neutro") as BankStance;
   const analysis = e.analise as StoredAnalysis | null;
   const when = e.analisado_em ? `${formatDay(e.analisado_em)} ${formatTime(e.analisado_em)}` : "";
 
@@ -114,7 +123,7 @@ async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
     <>
       <PageHeader
         title={`${e.moeda} · ${e.nome}`}
-        subtitle={`${formatDay(e.data_hora)} · ${formatTime(e.data_hora)} Lisboa · impacto ${e.impacto}${bank ? ` · leitura atual do ${bank.bank}: ${STANCE_LABEL[bank.stance]}` : ""}`}
+        subtitle={`${formatDay(e.data_hora)} · ${formatTime(e.data_hora)} Lisboa · impacto ${e.impacto}${bank ? ` · leitura atual do ${bank.bank}: ${STANCE_LABEL[currentStance]}` : ""}`}
         aside={
           <Link href="/calendario" className="text-[13px] text-up-soft hover:text-ink">
             ← Calendário
@@ -130,7 +139,7 @@ async function EventDetail({ params }: { params: Promise<{ id: string }> }) {
         />
         <AnalysisForm id={e.id} texto={e.texto} url={e.fonte_url} hasAnalysis={!!analysis} />
       </Card>
-      {analysis && <AnalysisView a={analysis} when={when} model={e.analise_modelo} />}
+      {analysis && <AnalysisView a={analysis} when={when} model={e.analise_modelo} code={e.moeda as Currency} current={currentStance} />}
       <Disclaimer source="Análise: Claude (Anthropic) a partir do texto fornecido · não constitui recomendação" />
     </>
   );

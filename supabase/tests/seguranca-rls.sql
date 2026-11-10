@@ -29,6 +29,18 @@ begin
   exception when insufficient_privilege or check_violation then r := r || ' | B cria em nome de A=recusado';
   end;
 
+  -- Leituras dos bancos centrais: A grava, B não vê nem altera
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated', 'aal', 'aal1')::text, true);
+  insert into public.leituras_bancos (moeda, postura, justificacao) values ('USD', 'Restritivo', 'teste');
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated', 'aal', 'aal1')::text, true);
+  select count(*) into n from public.leituras_bancos; r := r || ' | B vê leituras de A=' || n;
+  update public.leituras_bancos set postura = 'Neutro'; get diagnostics n = row_count; r := r || ' | B altera leituras de A=' || n;
+  begin
+    insert into public.leituras_bancos (moeda, postura, justificacao) values ('USD', 'Ninja', 'x');
+    r := r || ' | postura inválida=aceite(!)';
+  exception when check_violation then r := r || ' | postura inválida=recusada';
+  end;
+
   -- Visitante sem login
   perform set_config('role', 'anon', true);
   perform set_config('request.jwt.claims', '{"role":"anon"}', true);

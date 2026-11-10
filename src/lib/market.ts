@@ -62,3 +62,37 @@ export async function eurRateFor(pair: string): Promise<number | null> {
   if (!(price > 0)) throw new Error(`Taxa EUR/${quote} inválida`);
   return price;
 }
+
+type SeriesValues = SeriesResponse["values"];
+
+/**
+ * Barras diárias de vários pares num único pedido (1 crédito por par).
+ * Nunca lança erro dentro da cache (D50): devolve { error } com cache de minutos.
+ */
+export async function dailyBarsBatch(pairs: string[], count = 100): Promise<Record<string, Bar[]> | { error: string }> {
+  "use cache";
+  cacheTag("precos-lote");
+  try {
+    if (pairs.length < 2) throw new Error("O pedido em lote precisa de pelo menos 2 pares");
+    const data = await td<Record<string, { status?: string; message?: string; values?: SeriesValues }>>(
+      `/time_series?symbol=${encodeURIComponent(pairs.join(","))}&interval=1day&outputsize=${count}`,
+    );
+    const today = new Date().toISOString().slice(0, 10);
+    const out: Record<string, Bar[]> = {};
+    for (const pair of pairs) {
+      const entry = data[pair];
+      if (!entry?.values || entry.status === "error") continue;
+      const all = entry.values
+        .map((v) => ({ date: v.datetime, open: +v.open, high: +v.high, low: +v.low, close: +v.close }))
+        .filter((b) => [b.open, b.high, b.low, b.close].every(Number.isFinite) && b.low <= b.high)
+        .reverse();
+      const bars = completedWeekdayBars(all, today);
+      if (bars.length >= 50) out[pair] = bars;
+    }
+    cacheLife("hours");
+    return out;
+  } catch (e) {
+    cacheLife("minutes");
+    return { error: e instanceof Error ? e.message : "Erro desconhecido" };
+  }
+}

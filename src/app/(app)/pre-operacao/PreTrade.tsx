@@ -81,7 +81,10 @@ export function PreTrade() {
     /* eslint-disable react-hooks/set-state-in-effect -- leitura única de preferências locais */
     if (p.balance) setBalance(p.balance);
     if (p.riskPct) setRiskPct(p.riskPct);
-    if (p.pair && PAIRS.includes(p.pair)) setPair(p.pair);
+    // Um par indicado no endereço (ex.: vindo do painel) tem prioridade sobre o último usado.
+    const fromUrl = new URLSearchParams(window.location.search).get("par");
+    if (fromUrl && PAIRS.includes(fromUrl)) setPair(fromUrl);
+    else if (p.pair && PAIRS.includes(p.pair)) setPair(p.pair);
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => {
