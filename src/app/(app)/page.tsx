@@ -4,7 +4,7 @@ import { CurrencyStrength } from "@/components/dashboard/CurrencyStrength";
 import { PairsList } from "@/components/dashboard/PairsList";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { Card } from "@/components/ui/Card";
-import { Disclaimer, PageHeader, SampleNotice } from "@/components/ui/PageHeader";
+import { Disclaimer, PageHeader } from "@/components/ui/PageHeader";
 import { Today } from "@/components/ui/Today";
 import { getDashboard, macroAndFeatured } from "@/lib/dashboard";
 import { getReadings } from "@/lib/macro/readings";
@@ -34,7 +34,7 @@ async function Dashboard() {
 export default function Home() {
   return (
     <>
-      <PageHeader title="Visão geral" subtitle={<Today />} aside={<SampleNotice />} />
+      <PageHeader title="Visão geral" subtitle={<Today />} />
       <Suspense fallback={<Card><p className="text-muted">A carregar o painel…</p></Card>}>
         <Dashboard />
       </Suspense>

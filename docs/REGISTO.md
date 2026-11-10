@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapas 1–3 + sentimento + IA concluídas; próxima: Etapa 4 (Diário) · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 4 (Diário) construída — a aguardar teste do utilizador · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -69,6 +69,10 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D54 | Leitura do BC: a editada na app (tabela leituras_bancos) prevalece sobre a inicial do ficheiro; a IA só sugere, o utilizador aplica | Princípio híbrido (D11). |
 | D55 | Pares em destaque = 5 pares de maior divergência macro, máx. 2 aparições por moeda; preços num único pedido em lote | Variedade e limite de 8 pedidos/min da Twelve Data. |
 | D56 | Confirmação obrigatória quando a análise de um texto custar > 0,15 $ (estimativa ~3,3 caracteres/token) | Evitar surpresas de custo (página inteira custou 0,33 $). |
+| D57 | Estratégias: SMC, Divergência de Forças, Outra · Emoções: calmo, confiante, ansioso, impaciente, FOMO, a recuperar perdas | Respostas do utilizador. |
+| D58 | Operação registada ao entrar (a partir da pré-operação, com contexto e checklist) e fechada depois; R = pips ÷ stop; € calculado ou o real do MT5 | Contexto honesto no momento da decisão. |
+| D59 | Capturas num espaço privado do Supabase (pasta por utilizador, RLS + 2FA), reduzidas no browser a ≤1920 px WebP | Limite de 4,5 MB por pedido na Vercel; espaço gratuito de 1 GB. |
+| D60 | Estatísticas por: macro vs técnica, a favor/contra a macro, checklist, eventos < 2h, seguiu o plano, estratégia, emoção, sentimento, retalho, par; aviso de amostra pequena (< 50) | Responde às perguntas do utilizador com os seus dados. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -108,8 +112,8 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Leituras dos bancos centrais editáveis na app (ecrã Macro) + botão "Aplicar sugestão" nas análises; pré-operação e IA usam a leitura editada
 - [x] Pares em destaque com dados reais: 5 pares de maior divergência (máx. 2 por moeda), tendência/ATR reais, link para a pré-operação
 - [x] Aviso de custo antes de analisar textos longos (> 0,15 $ estimado)
-- [ ] Etapa 4 — Diário de operações (próximo)
-- [ ] Cartão "Risco por operação" do painel ainda usa saldo de exemplo (passa a usar o do diário na Etapa 4)
+- [x] Etapa 4 (construída): definições da conta na base de dados; registar operação a partir da pré-operação com contexto e checklist; captura de ecrã privada (reduzida no browser); fechar com preço de saída (resultado em pips, R e €, ou € real do MT5); estatísticas por 10 dimensões; histórico; cartões do painel com dados reais; sem dados de exemplo na app; 67 testes + 18 verificações de segurança
+- [ ] Importar histórico do MT5 (pedido para mais tarde)
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 

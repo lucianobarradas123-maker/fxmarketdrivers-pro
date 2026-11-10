@@ -5,6 +5,7 @@ import { Card, CardHeader, Label } from "@/components/ui/Card";
 import { decimal, euros, signed } from "@/lib/format";
 import { PAIRS } from "@/lib/pairs";
 import { positionSize, type PositionResult } from "@/lib/risk";
+import { RegisterTrade } from "./RegisterTrade";
 
 interface Market {
   pair: string;
@@ -64,11 +65,12 @@ const STATUS_STYLE: Record<Status, string> = {
 const STATUS_ICON: Record<Status, string> = { ok: "✓", alerta: "!", falha: "✕", pendente: "·", info: "–" };
 const STATUS_LABEL: Record<Status, string> = { ok: "cumprido", alerta: "atenção", falha: "não cumprido", pendente: "por avaliar", info: "não se aplica" };
 
-export function PreTrade() {
+export function PreTrade({ settings }: { settings: { saldo: number; risco_pct: number } | null }) {
   const [pair, setPair] = useState("EUR/USD");
   const [side, setSide] = useState<"compra" | "venda">("compra");
-  const [balance, setBalance] = useState("10000");
-  const [riskPct, setRiskPct] = useState("1");
+  // Saldo e risco: os guardados na tua conta (Diário → Definições); podes ajustar aqui só para esta simulação.
+  const [balance, setBalance] = useState(settings ? String(settings.saldo) : "10000");
+  const [riskPct, setRiskPct] = useState(settings ? String(settings.risco_pct) : "1");
   const [stop, setStop] = useState("");
   const [target, setTarget] = useState("");
   const [market, setMarket] = useState<Market | null>(null);
@@ -79,14 +81,14 @@ export function PreTrade() {
   useEffect(() => {
     const p = loadPrefs();
     /* eslint-disable react-hooks/set-state-in-effect -- leitura única de preferências locais */
-    if (p.balance) setBalance(p.balance);
-    if (p.riskPct) setRiskPct(p.riskPct);
+    if (!settings && p.balance) setBalance(p.balance);
+    if (!settings && p.riskPct) setRiskPct(p.riskPct);
     // Um par indicado no endereço (ex.: vindo do painel) tem prioridade sobre o último usado.
     const fromUrl = new URLSearchParams(window.location.search).get("par");
     if (fromUrl && PAIRS.includes(fromUrl)) setPair(fromUrl);
     else if (p.pair && PAIRS.includes(p.pair)) setPair(p.pair);
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+  }, [settings]);
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE, JSON.stringify({ balance, riskPct, pair }));
@@ -370,9 +372,36 @@ export function PreTrade() {
           </Card>
         )}
 
-        <button type="button" disabled className="min-h-12 cursor-not-allowed rounded-lg border border-line-strong font-semibold text-faint" title="Disponível na Etapa 4">
-          Registar no diário · disponível na Etapa 4
-        </button>
+        {market && result && !result.tooSmall ? (
+          <RegisterTrade
+            key={`${pair}-${side}-${stop}-${target}-${result.lots}`}
+            pair={pair}
+            side={side}
+            stopPips={num(stop)}
+            targetPips={target ? num(target) : null}
+            lots={result.lots}
+            pipValue={market.pipValue}
+            balance={num(balance)}
+            lastPrice={market.price}
+            context={{
+              bias: market.macro.bias,
+              trend: market.trend,
+              alignment: market.macro.alignment as "Alinhado" | "Conflito" | "Neutro",
+              divergence: market.macro.divergence,
+              atr: market.atr,
+              vol: market.vol,
+              risk: market.risk ? { index: market.risk.index, label: market.risk.label } : null,
+              retail: market.retail
+                ? { longPct: market.retail.longPct, shortPct: market.retail.shortPct, extreme: market.retail.read.extreme, contrarian: market.retail.read.contrarian }
+                : null,
+              eventsSoon: soonEvents.length,
+              price: market.price,
+            }}
+            checklist={checks.map((c) => ({ label: c.label, status: c.status }))}
+          />
+        ) : (
+          <p className="rounded-lg border border-line px-4 py-3 text-[13px] text-muted">Preenche o stop para poderes registar a operação no diário.</p>
+        )}
       </div>
     </div>
   );

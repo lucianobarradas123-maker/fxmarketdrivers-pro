@@ -41,6 +41,32 @@ begin
   exception when check_violation then r := r || ' | postura inválida=recusada';
   end;
 
+  -- Diário: A regista uma operação e definições; B não vê nem altera
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated', 'aal', 'aal1')::text, true);
+  insert into public.operacoes (par, direcao, estrategia, emocao, preco_entrada, stop_pips, lotes, valor_pip_eur, risco_eur)
+    values ('EUR/USD', 'venda', 'SMC', 'calmo', 1.12, 30, 0.33, 8.9, 88.11);
+  insert into public.definicoes_conta (saldo, risco_pct) values (10000, 1);
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated', 'aal', 'aal1')::text, true);
+  select count(*) into n from public.operacoes; r := r || ' | B vê operações de A=' || n;
+  update public.operacoes set lotes = 9; get diagnostics n = row_count; r := r || ' | B altera operações de A=' || n;
+  select count(*) into n from public.definicoes_conta; r := r || ' | B vê definições de A=' || n;
+  begin
+    insert into public.operacoes (par, direcao, estrategia, emocao, preco_entrada, stop_pips, lotes, valor_pip_eur, risco_eur, estado)
+      values ('EUR/USD', 'venda', 'SMC', 'calmo', 1.12, 30, 0.33, 8.9, 88.11, 'fechada');
+    r := r || ' | fechada sem saída=aceite(!)';
+  exception when check_violation then r := r || ' | fechada sem saída=recusada';
+  end;
+
+  -- Capturas: B não pode guardar ficheiros na pasta de A, mas pode na sua
+  begin
+    insert into storage.objects (bucket_id, name, owner) values ('capturas', a::text || '/x.png', b);
+    r := r || ' | B grava na pasta de A=SIM(!)';
+  exception when insufficient_privilege or check_violation then r := r || ' | B grava na pasta de A=recusado';
+  end;
+  insert into storage.objects (bucket_id, name, owner) values ('capturas', b::text || '/y.png', b);
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated', 'aal', 'aal1')::text, true);
+  select count(*) into n from storage.objects where bucket_id = 'capturas'; r := r || ' | A vê capturas de B=' || n;
+
   -- Visitante sem login
   perform set_config('role', 'anon', true);
   perform set_config('request.jwt.claims', '{"role":"anon"}', true);
