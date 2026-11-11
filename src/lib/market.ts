@@ -49,7 +49,7 @@ export async function dailyBars(pair: string, count = 100): Promise<{ bars: Bar[
 
 /** Versão sem cache própria (para usar dentro de outras funções com cache). */
 export async function fetchDailyBars(pair: string, count = 100): Promise<{ bars: Bar[]; fetchedAt: string }> {
-  const data = await td<SeriesResponse>(`/time_series?symbol=${encodeURIComponent(pair)}&interval=1day&outputsize=${count}`);
+  const data = await td<SeriesResponse>(`/time_series?symbol=${encodeURIComponent(pair)}&interval=1day&outputsize=${count}&timezone=UTC`);
   const now = new Date();
   const all = data.values
     .map((v) => ({ date: v.datetime, open: +v.open, high: +v.high, low: +v.low, close: +v.close }))
@@ -116,7 +116,7 @@ export async function dailyBarsBatch(pairs: string[], count = 100): Promise<Reco
   try {
     if (pairs.length < 2) throw new Error("O pedido em lote precisa de pelo menos 2 pares");
     const data = await td<Record<string, { status?: string; message?: string; values?: SeriesValues }>>(
-      `/time_series?symbol=${encodeURIComponent(pairs.join(","))}&interval=1day&outputsize=${count}`,
+      `/time_series?symbol=${encodeURIComponent(pairs.join(","))}&interval=1day&outputsize=${count}&timezone=UTC`,
     );
     const today = new Date().toISOString().slice(0, 10);
     const out: Record<string, Bar[]> = {};
@@ -134,6 +134,32 @@ export async function dailyBarsBatch(pairs: string[], count = 100): Promise<Reco
     return out;
   } catch (e) {
     cacheLife("minutes");
+    return { error: e instanceof Error ? e.message : "Erro desconhecido" };
+  }
+}
+
+export type Intraday = "1h" | "4h";
+
+/**
+ * Velas intradiárias (1h ou 4h) em UTC. Cache de ~15 min. Nunca lança erro dentro da cache (D50).
+ * Gasta 1 pedido da Twelve Data por atualização.
+ */
+export async function intradayBars(pair: string, interval: Intraday, count = 300): Promise<{ bars: Bar[]; fetchedAt: string } | { error: string }> {
+  "use cache";
+  cacheTag(`precos-${pair}-${interval}`);
+  try {
+    const data = await td<SeriesResponse>(
+      `/time_series?symbol=${encodeURIComponent(pair)}&interval=${interval}&outputsize=${count}&timezone=UTC`,
+    );
+    const bars = data.values
+      .map((v) => ({ date: v.datetime, open: +v.open, high: +v.high, low: +v.low, close: +v.close }))
+      .filter((b) => [b.open, b.high, b.low, b.close].every(Number.isFinite) && b.low <= b.high)
+      .reverse();
+    if (bars.length < 50) throw new Error(`Histórico ${interval} insuficiente para ${pair}`);
+    cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
+    return { bars, fetchedAt: new Date().toISOString() };
+  } catch (e) {
+    cacheLife("seconds");
     return { error: e instanceof Error ? e.message : "Erro desconhecido" };
   }
 }
