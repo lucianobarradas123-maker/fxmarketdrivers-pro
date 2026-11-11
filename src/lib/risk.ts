@@ -82,6 +82,22 @@ export function completedWeekdayBars(bars: Bar[], todayUtc: string): Bar[] {
   });
 }
 
+/**
+ * Velas intradiárias só com o mercado aberto: remove de sexta 22:00 a domingo 21:00 UTC
+ * (o Forex fecha ao fim de semana; os fornecedores devolvem velas planas que distorcem médias e ATR).
+ */
+export function marketHoursBars(bars: Bar[]): Bar[] {
+  return bars.filter((b) => {
+    const d = new Date(`${b.date.replace(" ", "T")}Z`);
+    const day = d.getUTCDay();
+    const h = d.getUTCHours();
+    if (day === 6) return false; // sábado
+    if (day === 5 && h >= 22) return false; // sexta à noite
+    if (day === 0 && h < 21) return false; // domingo antes da abertura
+    return true;
+  });
+}
+
 /** True range de cada barra (a partir da segunda). */
 function trueRanges(bars: Bar[]): number[] {
   const out: number[] = [];

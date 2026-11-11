@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapas 0–4 concluídas e testadas pelo utilizador · próximo: decidir Etapa 5 / Fase 6 · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapas 0–5 construídas · próximo: teste do ecrã Pares pelo utilizador, depois Fase 6 · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -75,6 +75,10 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D60 | Estatísticas por: macro vs técnica, a favor/contra a macro, checklist, eventos < 2h, seguiu o plano, estratégia, emoção, sentimento, retalho, par; aviso de amostra pequena (< 50) | Responde às perguntas do utilizador com os seus dados. |
 | D61 | Conversão do pip para EUR com as taxas de referência do BCE (diárias, sem chave); Twelve Data só como alternativa | Erro reportado pelo utilizador: limite de 8 pedidos/min ultrapassado ao mudar de par; poupa 1 pedido por par. |
 | D62 | Preços: falhas nunca ficam em cache; limite por minuto devolve 429 e a pré-operação volta a tentar sozinha após 60 s | Mensagens claras em vez do erro genérico do Next.js. |
+| D63 | Ecrã Pares: H4 = direção, H1 = entrada, D1 = contexto; EMA 8/21 (exponenciais); tendência = preço vs EMA8 vs EMA21; ATR(14) por período | Preferências do utilizador. |
+| D64 | Suportes/resistências automáticos: fractais (2 velas de cada lado) do H4 (~50 dias), agrupados a ½ ATR do H4, 3 níveis de cada lado com n.º de toques | Transparente e reproduzível. |
+| D65 | Velas intradiárias: só horas de mercado (sem sexta 22h–domingo 21h UTC); todos os pedidos em UTC | Velas planas de fim de semana distorciam médias e ATR. |
+| D66 | Dados macro atualizados por GitHub Actions com curl (o servidor da OCDE responde 500 ao cliente HTTP do Node); atualização parcial se uma parte falhar | Primeira execução falhou por isso; corrigido e testado. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -117,8 +121,9 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Etapa 4 (construída): definições da conta na base de dados; registar operação a partir da pré-operação com contexto e checklist; captura de ecrã privada (reduzida no browser); fechar com preço de saída (resultado em pips, R e €, ou € real do MT5); estatísticas por 10 dimensões; histórico; cartões do painel com dados reais; sem dados de exemplo na app; 67 testes + 18 verificações de segurança
 - [x] Diário testado pelo utilizador sem erros; correção do limite de pedidos confirmada
 - [ ] Importar histórico do MT5 (pedido para mais tarde)
-- [ ] Etapa 5 — ecrã "Pares" (gráfico de velas H1/H4/D1) ainda "em construção"
-- [ ] Automatizar atualização dos dados macro da OCDE (hoje manual: npm run data:macro)
+- [x] Etapa 5 (construída): ecrã Pares com gráfico de velas H4/H1/D1, EMA 8 e 21, ATR, suportes/resistências automáticos, tendência por período e confirmação H1 vs H4, contexto macro; 78 testes
+- [x] Atualização automática dos dados macro (GitHub Actions, segundas e quintas; testada com sucesso); dados de outubro já incluídos
+- [ ] Serviço de email próprio (SMTP) — opcional, passos dados ao utilizador
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 

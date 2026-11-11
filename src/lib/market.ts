@@ -7,7 +7,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { currenciesOf } from "@/lib/pairs";
 import { parseEcbRates } from "@/lib/ecb";
-import { completedWeekdayBars, type Bar } from "@/lib/risk";
+import { completedWeekdayBars, marketHoursBars, type Bar } from "@/lib/risk";
 
 const BASE = "https://api.twelvedata.com";
 /** Mensagem usada quando o limite de pedidos por minuto é atingido (a interface volta a tentar sozinha). */
@@ -151,10 +151,12 @@ export async function intradayBars(pair: string, interval: Intraday, count = 300
     const data = await td<SeriesResponse>(
       `/time_series?symbol=${encodeURIComponent(pair)}&interval=${interval}&outputsize=${count}&timezone=UTC`,
     );
-    const bars = data.values
-      .map((v) => ({ date: v.datetime, open: +v.open, high: +v.high, low: +v.low, close: +v.close }))
-      .filter((b) => [b.open, b.high, b.low, b.close].every(Number.isFinite) && b.low <= b.high)
-      .reverse();
+    const bars = marketHoursBars(
+      data.values
+        .map((v) => ({ date: v.datetime, open: +v.open, high: +v.high, low: +v.low, close: +v.close }))
+        .filter((b) => [b.open, b.high, b.low, b.close].every(Number.isFinite) && b.low <= b.high)
+        .reverse(),
+    );
     if (bars.length < 50) throw new Error(`Histórico ${interval} insuficiente para ${pair}`);
     cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
     return { bars, fetchedAt: new Date().toISOString() };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { atrAverage, atrPips, completedWeekdayBars, pipSize, pipValueEur, positionSize, trendOf, type Bar } from "./risk";
+import { atrAverage, atrPips, completedWeekdayBars, marketHoursBars, pipSize, pipValueEur, positionSize, trendOf, type Bar } from "./risk";
 
 describe("pip", () => {
   it("tamanho do pip", () => {
@@ -92,5 +92,13 @@ describe("barras completas de dias úteis", () => {
     // 2026-11-05 quinta, 06 sexta, 07 sábado, 08 domingo, 09 segunda (hoje)
     const out = completedWeekdayBars(["2026-11-05", "2026-11-06", "2026-11-07", "2026-11-08", "2026-11-09"].map(mk), "2026-11-09");
     expect(out.map((b) => b.date)).toEqual(["2026-11-05", "2026-11-06"]);
+  });
+});
+
+describe("velas com o mercado aberto", () => {
+  const mk = (date: string): Bar => ({ date, open: 1, high: 1, low: 1, close: 1 });
+  it("remove de sexta 22h a domingo 21h (UTC)", () => {
+    const dates = ["2026-11-06 20:00:00", "2026-11-06 22:00:00", "2026-11-07 12:00:00", "2026-11-08 20:00:00", "2026-11-08 21:00:00", "2026-11-09 08:00:00"];
+    expect(marketHoursBars(dates.map(mk)).map((b) => b.date)).toEqual(["2026-11-06 20:00:00", "2026-11-08 21:00:00", "2026-11-09 08:00:00"]);
   });
 });
