@@ -12,6 +12,7 @@ interface Market {
   price: number;
   lastBar: string;
   pipValue: number;
+  eurSource: string;
   atr: number;
   atrAvg: number;
   vol: "baixa" | "normal" | "elevada";
@@ -76,6 +77,8 @@ export function PreTrade({ settings }: { settings: { saldo: number; risco_pct: n
   const [market, setMarket] = useState<Market | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Quando o limite de pedidos por minuto é atingido, volta a tentar sozinho.
+  const [retry, setRetry] = useState(0);
 
   // Preferências guardadas neste dispositivo (saldo, risco, último par).
   useEffect(() => {
@@ -102,9 +105,11 @@ export function PreTrade({ settings }: { settings: { saldo: number; risco_pct: n
     /* eslint-disable-next-line react-hooks/set-state-in-effect -- início de pedido de rede */
     setLoading(true);
     setError(null);
+    let timer: ReturnType<typeof setTimeout> | undefined;
     fetch(`/api/mercado?par=${encodeURIComponent(pair)}`)
       .then(async (r) => {
-        const body = await r.json();
+        const body = await r.json().catch(() => ({}));
+        if (r.status === 429 && body.retryAfter) timer = setTimeout(() => setRetry((n) => n + 1), body.retryAfter * 1000);
         if (!r.ok) throw new Error(body.error ?? "Erro ao obter dados de mercado.");
         return body as Market;
       })
@@ -113,8 +118,9 @@ export function PreTrade({ settings }: { settings: { saldo: number; risco_pct: n
       .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
+      if (timer) clearTimeout(timer);
     };
-  }, [pair]);
+  }, [pair, retry]);
 
   const num = (v: string) => Number(v.replace(",", "."));
   const result: PositionResult | null = useMemo(() => {
@@ -278,6 +284,7 @@ export function PreTrade({ settings }: { settings: { saldo: number; risco_pct: n
               </dl>
               <p className="text-xs text-faint">
                 Arredondado para baixo ao passo de 0,01 lotes · valor do pip: {decimal(market.pipValue, 2)} €/lote
+                {market.eurSource !== "—" ? ` (conversão: ${market.eurSource})` : ""}
               </p>
             </>
           )}

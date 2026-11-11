@@ -73,6 +73,8 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D58 | Operação registada ao entrar (a partir da pré-operação, com contexto e checklist) e fechada depois; R = pips ÷ stop; € calculado ou o real do MT5 | Contexto honesto no momento da decisão. |
 | D59 | Capturas num espaço privado do Supabase (pasta por utilizador, RLS + 2FA), reduzidas no browser a ≤1920 px WebP | Limite de 4,5 MB por pedido na Vercel; espaço gratuito de 1 GB. |
 | D60 | Estatísticas por: macro vs técnica, a favor/contra a macro, checklist, eventos < 2h, seguiu o plano, estratégia, emoção, sentimento, retalho, par; aviso de amostra pequena (< 50) | Responde às perguntas do utilizador com os seus dados. |
+| D61 | Conversão do pip para EUR com as taxas de referência do BCE (diárias, sem chave); Twelve Data só como alternativa | Erro reportado pelo utilizador: limite de 8 pedidos/min ultrapassado ao mudar de par; poupa 1 pedido por par. |
+| D62 | Preços: falhas nunca ficam em cache; limite por minuto devolve 429 e a pré-operação volta a tentar sozinha após 60 s | Mensagens claras em vez do erro genérico do Next.js. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação

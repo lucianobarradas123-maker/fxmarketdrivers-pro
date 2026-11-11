@@ -6,9 +6,12 @@ import "server-only";
  */
 import { cacheLife, cacheTag } from "next/cache";
 import { currenciesOf } from "@/lib/pairs";
+import { parseEcbRates } from "@/lib/ecb";
 import { completedWeekdayBars, type Bar } from "@/lib/risk";
 
 const BASE = "https://api.twelvedata.com";
+/** Mensagem usada quando o limite de pedidos por minuto é atingido (a interface volta a tentar sozinha). */
+export const RATE_LIMITED = "Limite de pedidos por minuto da Twelve Data atingido.";
 
 function apiKey(): string {
   const key = process.env.TWELVE_DATA_API_KEY;
@@ -20,7 +23,7 @@ async function td<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { headers: { Authorization: `apikey ${apiKey()}` } });
   const body = (await res.json()) as T & { status?: string; code?: number; message?: string };
   if (!res.ok || body.status === "error") {
-    if (body.code === 429) throw new Error("Limite de pedidos da Twelve Data atingido. Tenta dentro de 1 minuto.");
+    if (body.code === 429 || res.status === 429) throw new Error(RATE_LIMITED);
     throw new Error(`Twelve Data: ${body.message ?? res.status}`);
   }
   return body;
@@ -31,11 +34,17 @@ interface SeriesResponse {
 }
 
 /** Últimas N barras diárias completas de dias úteis, da mais antiga para a mais recente (pares, ouro ou ETF). */
-export async function dailyBars(pair: string, count = 100): Promise<{ bars: Bar[]; fetchedAt: string }> {
+export async function dailyBars(pair: string, count = 100): Promise<{ bars: Bar[]; fetchedAt: string } | { error: string }> {
   "use cache";
-  cacheLife("hours");
   cacheTag(`precos-${pair}`);
-  return fetchDailyBars(pair, count);
+  try {
+    const r = await fetchDailyBars(pair, count);
+    cacheLife("hours");
+    return r;
+  } catch (e) {
+    cacheLife("seconds"); // falhas (ex.: limite por minuto) não ficam guardadas
+    return { error: e instanceof Error ? e.message : "Erro desconhecido" };
+  }
 }
 
 /** Versão sem cache própria (para usar dentro de outras funções com cache). */
@@ -51,16 +60,48 @@ export async function fetchDailyBars(pair: string, count = 100): Promise<{ bars:
   return { bars, fetchedAt: now.toISOString() };
 }
 
-/** Taxa EUR/<moeda cotada> para converter o valor do pip para EUR. null se a cotada for EUR. */
-export async function eurRateFor(pair: string): Promise<number | null> {
+/** Taxas de referência do BCE (todas as moedas num só pedido, sem chave). Em cache durante horas. */
+async function ecbRates(): Promise<{ date: string; rates: Record<string, number> } | { error: string }> {
   "use cache";
-  cacheLife("hours");
+  cacheTag("taxas-bce");
+  try {
+    const res = await fetch("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml");
+    if (!res.ok) throw new Error(`BCE respondeu ${res.status}`);
+    const r = parseEcbRates(await res.text());
+    cacheLife("hours");
+    return r;
+  } catch (e) {
+    cacheLife("minutes");
+    return { error: e instanceof Error ? e.message : "Erro desconhecido" };
+  }
+}
+
+/** Alternativa se o BCE falhar: preço atual da Twelve Data (gasta 1 pedido). */
+async function twelveDataPrice(symbol: string): Promise<number | { error: string }> {
+  "use cache";
+  try {
+    const data = await td<{ price: string }>(`/price?symbol=${encodeURIComponent(symbol)}`);
+    const price = Number(data.price);
+    if (!(price > 0)) throw new Error(`Taxa ${symbol} inválida`);
+    cacheLife("hours");
+    return price;
+  } catch (e) {
+    cacheLife("seconds");
+    return { error: e instanceof Error ? e.message : "Erro desconhecido" };
+  }
+}
+
+/**
+ * Taxa EUR/<moeda cotada> para converter o valor do pip para EUR (null se a cotada for EUR).
+ * Fonte: taxas de referência do BCE; se indisponíveis, Twelve Data.
+ */
+export async function eurRateFor(pair: string): Promise<{ rate: number | null; source: string } | { error: string }> {
   const quote = currenciesOf(pair)[1];
-  if (quote === "EUR") return null;
-  const data = await td<{ price: string }>(`/price?symbol=EUR/${quote}`);
-  const price = Number(data.price);
-  if (!(price > 0)) throw new Error(`Taxa EUR/${quote} inválida`);
-  return price;
+  if (quote === "EUR") return { rate: null, source: "—" };
+  const ecb = await ecbRates();
+  if (!("error" in ecb) && ecb.rates[quote] > 0) return { rate: ecb.rates[quote], source: `BCE, ${ecb.date}` };
+  const fallback = await twelveDataPrice(`EUR/${quote}`);
+  return typeof fallback === "number" ? { rate: fallback, source: "Twelve Data" } : fallback;
 }
 
 type SeriesValues = SeriesResponse["values"];

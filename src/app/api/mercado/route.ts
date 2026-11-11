@@ -4,7 +4,7 @@ import { getUpcoming } from "@/lib/events";
 import { getMacro } from "@/lib/macro/build";
 import { getReadings } from "@/lib/macro/readings";
 import { alignment, biasFrom, volLevel } from "@/lib/macro/score";
-import { dailyBars, eurRateFor } from "@/lib/market";
+import { dailyBars, eurRateFor, RATE_LIMITED } from "@/lib/market";
 import { currenciesOf, isPair } from "@/lib/pairs";
 import { atrAverage, atrPips, pipValueEur, trendOf } from "@/lib/risk";
 import { createClient } from "@/lib/supabase/server";
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   const [base, quote] = currenciesOf(pair);
 
   try {
-    const [{ bars, fetchedAt }, eurRate, upcoming, risk, retail, readings] = await Promise.all([
+    const [series, eur, upcoming, risk, retail, readings] = await Promise.all([
       dailyBars(pair),
       eurRateFor(pair),
       getUpcoming(1, "alto"),
@@ -33,6 +33,18 @@ export async function GET(request: NextRequest) {
       getReadings(),
     ]);
     const retailPair = retail?.pairs[pair] ?? null;
+    // Limite de pedidos por minuto: 429 para a interface voltar a tentar sozinha.
+    for (const r of [series, eur]) {
+      if ("error" in r) {
+        const limited = r.error === RATE_LIMITED;
+        return NextResponse.json(
+          { error: limited ? "Limite de pedidos de preços por minuto atingido. A tentar de novo dentro de 1 minuto…" : `Dados de mercado indisponíveis: ${r.error}`, retryAfter: limited ? 60 : null },
+          { status: limited ? 429 : 502 },
+        );
+      }
+    }
+    const { bars, fetchedAt } = series as Exclude<typeof series, { error: string }>;
+    const { rate: eurRate, source: eurSource } = eur as Exclude<typeof eur, { error: string }>;
     const macro = getMacro(risk, readings);
     const b = macro.find((c) => c.code === base)!;
     const q = macro.find((c) => c.code === quote)!;
@@ -49,6 +61,7 @@ export async function GET(request: NextRequest) {
       lastBar: last.date,
       pipValue: pipValueEur(pair, eurRate),
       eurRate,
+      eurSource,
       atr: Math.round(atr * 10) / 10,
       atrAvg: Math.round(atrAvg * 10) / 10,
       vol: volLevel(atr, atrAvg),
