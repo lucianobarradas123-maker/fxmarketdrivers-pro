@@ -1,0 +1,47 @@
+# Atualiza semanalmente os dados macro (inflação e desemprego da OCDE) e publica-os.
+# Se a OCDE falhar, a execução falha e o GitHub envia um email ao dono do repositório.
+name: Dados macro (OCDE)
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # segundas-feiras, 06:17 UTC
+  workflow_dispatch: # permite correr à mão no separador "Actions"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dados-macro
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Obter dados da OCDE
+        run: npm run data:macro
+      - name: Validar (testes)
+        run: npm test
+      - name: Guardar se houver dados novos
+        run: |
+          if git diff --quiet -- src/data/macro-snapshot.json; then
+            echo "Sem dados novos."
+            exit 0
+          fi
+          # Só a data de recolha mudou? Não vale a pena publicar.
+          if [ "$(git diff -U0 -- src/data/macro-snapshot.json | grep -cE '^[+-] ' )" -le 2 ] && git diff -U0 -- src/data/macro-snapshot.json | grep -qE '^\+.*"fetchedAt"'; then
+            echo "Só mudou a data de recolha."
+            exit 0
+          fi
+          git config user.name "fxmarketdrivers-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/macro-snapshot.json
+          git commit -m "Dados macro atualizados (OCDE, automático)"
+          git push
