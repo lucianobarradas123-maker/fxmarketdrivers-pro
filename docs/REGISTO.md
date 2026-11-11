@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa 4 (Diário) construída — a aguardar teste do utilizador · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapas 0–4 concluídas e testadas pelo utilizador · próximo: decidir Etapa 5 / Fase 6 · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -115,7 +115,10 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Pares em destaque com dados reais: 5 pares de maior divergência (máx. 2 por moeda), tendência/ATR reais, link para a pré-operação
 - [x] Aviso de custo antes de analisar textos longos (> 0,15 $ estimado)
 - [x] Etapa 4 (construída): definições da conta na base de dados; registar operação a partir da pré-operação com contexto e checklist; captura de ecrã privada (reduzida no browser); fechar com preço de saída (resultado em pips, R e €, ou € real do MT5); estatísticas por 10 dimensões; histórico; cartões do painel com dados reais; sem dados de exemplo na app; 67 testes + 18 verificações de segurança
+- [x] Diário testado pelo utilizador sem erros; correção do limite de pedidos confirmada
 - [ ] Importar histórico do MT5 (pedido para mais tarde)
+- [ ] Etapa 5 — ecrã "Pares" (gráfico de velas H1/H4/D1) ainda "em construção"
+- [ ] Automatizar atualização dos dados macro da OCDE (hoje manual: npm run data:macro)
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 
