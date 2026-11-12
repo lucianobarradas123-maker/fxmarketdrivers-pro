@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapas 0–5 construídas · próximo: teste do ecrã Pares pelo utilizador, depois Fase 6 · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Fase 6 (testes e otimização) em curso — ver docs/FASE6-RELATORIO.md · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -79,6 +79,8 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Etapa
 | D64 | Suportes/resistências automáticos: fractais (2 velas de cada lado) do H4 (~50 dias), agrupados a ½ ATR do H4, 3 níveis de cada lado com n.º de toques | Transparente e reproduzível. |
 | D65 | Velas intradiárias: só horas de mercado (sem sexta 22h–domingo 21h UTC); todos os pedidos em UTC | Velas planas de fim de semana distorciam médias e ATR. |
 | D66 | Dados macro atualizados por GitHub Actions com curl (o servidor da OCDE responde 500 ao cliente HTTP do Node); atualização parcial se uma parte falhar | Primeira execução falhou por isso; corrigido e testado. |
+| D67 | CSP "sem nonces" (só recursos do próprio site) + páginas de erro próprias; função de 2FA no esquema privado | Fase 6. |
+| D68 | Proteção HaveIBeenPwned não ativada (só plano Pro do Supabase) | Mitigada por palavra-passe forte + 2FA. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -124,6 +126,9 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Etapa 5 (construída): ecrã Pares com gráfico de velas H4/H1/D1, EMA 8 e 21, ATR, suportes/resistências automáticos, tendência por período e confirmação H1 vs H4, contexto macro; 78 testes
 - [x] Atualização automática dos dados macro (GitHub Actions, segundas e quintas; testada com sucesso); dados de outubro já incluídos
 - [ ] Serviço de email próprio (SMTP) — opcional, passos dados ao utilizador
+- [x] Ecrã Pares testado pelo utilizador
+- [x] Fase 6: segurança (função 2FA privada, CSP, npm audit 0), desempenho (LCP ~1,1 s em telemóvel lento), acessibilidade (0 violações), páginas de erro em PT, "Pares" na barra do telemóvel
+- [ ] Fase 7: cópias de segurança (exportar diário), evitar pausa do Supabase, SMTP, custos, checklist de lançamento
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 

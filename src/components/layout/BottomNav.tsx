@@ -14,7 +14,7 @@ export function BottomNavView({ pathname }: { pathname: string }) {
   return (
     <nav
       aria-label="Navegação"
-      className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-line bg-bar/95 px-1 pt-1.5 pb-[max(env(safe-area-inset-bottom),12px)] backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-6 border-t border-line bg-bar/95 px-1 pt-1.5 pb-[max(env(safe-area-inset-bottom),12px)] backdrop-blur md:hidden"
     >
       {NAV_ITEMS.filter((i) => i.mobile).map((item) => {
         const active = isActive(pathname, item.href);
