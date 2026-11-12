@@ -1,0 +1,25 @@
+# Mantém o projeto gratuito do Supabase ativo: sem atividade durante ~7 dias, o Supabase pausa-o.
+# Chama uma função mínima (devolve "1"; não lê dados). A chave usada é a "publishable", pública por natureza.
+name: Manter Supabase ativo
+
+on:
+  schedule:
+    - cron: "29 4 */3 * *" # de 3 em 3 dias, 04:29 UTC
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Chamar manter_ativo()
+        env:
+          SUPABASE_URL: https://kbfncjkxhhfsueuzbgrp.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_0rqRo94zqY6ANuU1Djfayw_41LxvvR-
+        run: |
+          resposta=$(curl -sS -m 30 --retry 3 --retry-delay 10 -X POST "$SUPABASE_URL/rest/v1/rpc/manter_ativo" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -H "Content-Type: application/json" -d '{}')
+          echo "Resposta: $resposta"
+          test "$resposta" = "1"
