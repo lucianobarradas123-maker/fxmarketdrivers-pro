@@ -1,3 +1,4 @@
+import Link from "next/link";
 export function PageHeader({ title, subtitle, aside }: { title: string; subtitle?: React.ReactNode; aside?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
@@ -14,7 +15,12 @@ export function Disclaimer({ source = "Macro: OCDE + as tuas leituras · Preços
   return (
     <footer className="flex flex-wrap justify-between gap-2 border-t border-line-soft pt-3 text-xs text-faint">
       <span>Informação e análise para apoio à decisão. Não é aconselhamento financeiro nem garante resultados. A decisão é sempre tua.</span>
-      <span>{source}</span>
+      <span className="flex flex-wrap gap-x-3">
+        <span>{source}</span>
+        <Link href="/ajuda" className="text-up-soft hover:text-ink">
+          Ajuda
+        </Link>
+      </span>
     </footer>
   );
 }

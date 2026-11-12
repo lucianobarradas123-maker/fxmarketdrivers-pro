@@ -1,6 +1,6 @@
 # Registo do Projeto — FX Market Drivers Pro
 
-_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Fase 6 (testes e otimização) em curso — ver docs/FASE6-RELATORIO.md · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
+_Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Fase 7 (preparação para uso a longo prazo) — ver docs/FASE6-RELATORIO.md e /ajuda na app · app em https://fxmarketdrivers-pro-syjy.vercel.app · Arquitetura: ver ARQUITETURA.md · Plano: ver PLANO.md_
 
 ## Perfil do utilizador
 - Experiência: opera com dinheiro real há pouco tempo.
@@ -81,6 +81,9 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Fase 
 | D66 | Dados macro atualizados por GitHub Actions com curl (o servidor da OCDE responde 500 ao cliente HTTP do Node); atualização parcial se uma parte falhar | Primeira execução falhou por isso; corrigido e testado. |
 | D67 | CSP "sem nonces" (só recursos do próprio site) + páginas de erro próprias; função de 2FA no esquema privado | Fase 6. |
 | D68 | Proteção HaveIBeenPwned não ativada (só plano Pro do Supabase) | Mitigada por palavra-passe forte + 2FA. |
+| D69 | Cópias de segurança: exportação pelo utilizador (JSON completo / CSV com proteção contra fórmulas) + lembrete se > 30 dias | Plano gratuito sem cópias recuperáveis. |
+| D70 | Tarefa GitHub de 3 em 3 dias chama public.manter_ativo() (devolve 1) com a chave publicável | Evitar pausa por inatividade do Supabase gratuito. |
+| D71 | Manual de utilização dentro da app (/ajuda): rotina, indicadores, fontes, custos e limites, segurança, problemas | Sempre à mão; sem domínio próprio (decisão do utilizador). |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -128,7 +131,8 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [ ] Serviço de email próprio (SMTP) — opcional, passos dados ao utilizador
 - [x] Ecrã Pares testado pelo utilizador
 - [x] Fase 6: segurança (função 2FA privada, CSP, npm audit 0), desempenho (LCP ~1,1 s em telemóvel lento), acessibilidade (0 violações), páginas de erro em PT, "Pares" na barra do telemóvel
-- [ ] Fase 7: cópias de segurança (exportar diário), evitar pausa do Supabase, SMTP, custos, checklist de lançamento
+- [x] Fase 7: exportação dos dados (JSON completo e CSV para Excel) + lembrete mensal no painel; tarefa automática para o Supabase não pausar; manual de utilização com custos e limites (página /ajuda)
+- [ ] SMTP próprio (opcional, utilizador)
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 

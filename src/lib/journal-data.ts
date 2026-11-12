@@ -7,12 +7,13 @@ import type { ChecklistItem, EntryContext } from "@/lib/journal";
 export interface Settings {
   saldo: number;
   risco_pct: number;
+  ultima_exportacao: string | null;
 }
 
 export async function getSettings(): Promise<Settings | null> {
   const supabase = await createClient();
-  const { data } = await supabase.from("definicoes_conta").select("saldo, risco_pct").maybeSingle();
-  return data ? { saldo: Number(data.saldo), risco_pct: Number(data.risco_pct) } : null;
+  const { data } = await supabase.from("definicoes_conta").select("saldo, risco_pct, ultima_exportacao").maybeSingle();
+  return data ? { saldo: Number(data.saldo), risco_pct: Number(data.risco_pct), ultima_exportacao: data.ultima_exportacao } : null;
 }
 
 export interface Trade {
