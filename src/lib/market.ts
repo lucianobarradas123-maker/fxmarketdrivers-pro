@@ -114,28 +114,34 @@ export async function dailyBarsBatch(pairs: string[], count = 100): Promise<Reco
   "use cache";
   cacheTag("precos-lote");
   try {
-    if (pairs.length < 2) throw new Error("O pedido em lote precisa de pelo menos 2 pares");
-    const data = await td<Record<string, { status?: string; message?: string; values?: SeriesValues }>>(
-      `/time_series?symbol=${encodeURIComponent(pairs.join(","))}&interval=1day&outputsize=${count}&timezone=UTC`,
-    );
-    const today = new Date().toISOString().slice(0, 10);
-    const out: Record<string, Bar[]> = {};
-    for (const pair of pairs) {
-      const entry = data[pair];
-      if (!entry?.values || entry.status === "error") continue;
-      const all = entry.values
-        .map((v) => ({ date: v.datetime, open: +v.open, high: +v.high, low: +v.low, close: +v.close }))
-        .filter((b) => [b.open, b.high, b.low, b.close].every(Number.isFinite) && b.low <= b.high)
-        .reverse();
-      const bars = completedWeekdayBars(all, today);
-      if (bars.length >= 50) out[pair] = bars;
-    }
+    const out = await fetchDailyBatch(pairs, count);
     cacheLife("hours");
     return out;
   } catch (e) {
     cacheLife("minutes");
     return { error: e instanceof Error ? e.message : "Erro desconhecido" };
   }
+}
+
+/** Barras diárias completas de dias úteis de vários símbolos num único pedido (1 crédito por símbolo). Lança erro. */
+export async function fetchDailyBatch(pairs: string[], count = 100, minBars = 50): Promise<Record<string, Bar[]>> {
+  if (pairs.length < 2) throw new Error("O pedido em lote precisa de pelo menos 2 símbolos");
+  const data = await td<Record<string, { status?: string; message?: string; values?: SeriesValues }>>(
+    `/time_series?symbol=${encodeURIComponent(pairs.join(","))}&interval=1day&outputsize=${count}&timezone=UTC`,
+  );
+  const today = new Date().toISOString().slice(0, 10);
+  const out: Record<string, Bar[]> = {};
+  for (const pair of pairs) {
+    const entry = data[pair];
+    if (!entry?.values || entry.status === "error") continue;
+    const all = entry.values
+      .map((v) => ({ date: v.datetime, open: +v.open, high: +v.high, low: +v.low, close: +v.close }))
+      .filter((b) => [b.open, b.high, b.low, b.close].every(Number.isFinite) && b.low <= b.high)
+      .reverse();
+    const bars = completedWeekdayBars(all, today);
+    if (bars.length >= minBars) out[pair] = bars;
+  }
+  return out;
 }
 
 export type Intraday = "1h" | "4h";

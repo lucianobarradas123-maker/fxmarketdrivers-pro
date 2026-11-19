@@ -2,7 +2,7 @@ export interface NavItem {
   href: string;
   label: string;
   short: string;
-  icon: "grid" | "globe" | "calendar" | "shield" | "book" | "pairs";
+  icon: "grid" | "globe" | "calendar" | "shield" | "book" | "pairs" | "chart";
   mobile: boolean;
 }
 
@@ -13,6 +13,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/pre-operacao", label: "Pré-operação", short: "Risco", icon: "shield", mobile: true },
   { href: "/diario", label: "Diário", short: "Diário", icon: "book", mobile: true },
   { href: "/pares", label: "Pares", short: "Pares", icon: "pairs", mobile: true },
+  { href: "/historico", label: "Histórico", short: "Histórico", icon: "chart", mobile: false },
 ];
 
 export function isActive(pathname: string, href: string) {

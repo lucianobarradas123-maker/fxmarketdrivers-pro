@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { decimal, signed } from "@/lib/format";
 import type { RiskSentiment } from "@/lib/sentiment";
@@ -38,6 +39,9 @@ export function RiskPanel({ risk }: { risk: RiskSentiment | null }) {
               </li>
             ))}
           </ul>
+          <Link href="/historico?vista=sentimento" className="inline-flex min-h-11 items-center rounded-lg border border-line-strong px-4 text-[13px] font-semibold hover:bg-surface-2">
+            Ver histórico
+          </Link>
         </div>
       )}
     </Card>

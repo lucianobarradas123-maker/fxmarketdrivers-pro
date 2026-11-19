@@ -82,6 +82,9 @@ function RiskStat({ risk }: { risk: D["risk"] }) {
         <span>Medo</span>
         <span>Ganância</span>
       </div>
+      <Link href="/historico?vista=sentimento" className="text-xs text-up-soft hover:text-ink">
+        Ver histórico →
+      </Link>
     </Stat>
   );
 }

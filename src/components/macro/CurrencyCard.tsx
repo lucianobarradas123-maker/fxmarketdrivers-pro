@@ -5,6 +5,7 @@ import type { getMacro } from "@/lib/macro/build";
 import { STANCE_LABEL, STANCE_POINTS } from "@/lib/macro/score";
 import { RISK_BETA } from "@/lib/sentiment";
 import { ReadingEditor } from "./ReadingEditor";
+import Link from "next/link";
 
 type C = ReturnType<typeof getMacro>[number];
 
@@ -78,6 +79,9 @@ export function CurrencyCard({ c, rank, riskLabel }: { c: C; rank: number; riskL
         <div className="flex flex-col items-end">
           <span className={`num text-2xl font-semibold ${c.total >= 0 ? "text-up" : "text-down"}`}>{signed(c.total)}</span>
           <span className="text-[11px] text-faint">pontuação total</span>
+          <Link href={`/historico?vista=moedas&moedas=${c.code}`} className="mt-1 text-xs text-up-soft hover:text-ink">
+            Ver histórico →
+          </Link>
         </div>
       </header>
 

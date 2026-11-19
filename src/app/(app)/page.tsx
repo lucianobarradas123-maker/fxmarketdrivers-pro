@@ -11,6 +11,10 @@ import { getReadings } from "@/lib/macro/readings";
 import { needsBackupReminder } from "@/lib/export";
 import { getSettings, getTrades } from "@/lib/journal-data";
 import Link from "next/link";
+import { after } from "next/server";
+import { recordStrength } from "@/lib/history-data";
+import { STANCE_POINTS } from "@/lib/macro/score";
+import { createClient } from "@/lib/supabase/server";
 import { dailyBarsBatch } from "@/lib/market";
 import { getRetailSentimentSafe } from "@/lib/retail-data";
 import { getRiskSentimentSafe } from "@/lib/sentiment-data";
@@ -24,6 +28,14 @@ async function Dashboard() {
   const d = getDashboard(risk, retail, readings, "error" in batch ? null : batch);
   const [settings, { now, trades }] = await Promise.all([getSettings(), getTrades(1)]);
   const remind = needsBackupReminder(settings?.ultima_exportacao ?? null, trades.length > 0, now);
+  // Guarda a força macro de hoje para o histórico (depois de a página ser enviada; não a atrasa).
+  const supabase = await createClient();
+  after(() =>
+    recordStrength(
+      supabase,
+      d.currencies.map((c) => ({ code: c.code, total: c.total, dataScore: c.dataScore, stancePoints: STANCE_POINTS[c.stance], riskScore: c.riskScore })),
+    ),
+  );
   return (
     <div className="fade-in flex flex-col gap-5">
       {remind && (

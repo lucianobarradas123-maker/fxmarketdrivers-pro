@@ -57,6 +57,12 @@ begin
   exception when check_violation then r := r || ' | fechada sem saída=recusada';
   end;
 
+  -- Histórico da força: B não vê o de A
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated', 'aal', 'aal1')::text, true);
+  insert into public.historico_forca (dia, moeda, total, dados, banco, risco) values (current_date, 'USD', 2, 1, 1, 0);
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated', 'aal', 'aal1')::text, true);
+  select count(*) into n from public.historico_forca; r := r || ' | B vê histórico de A=' || n;
+
   -- Capturas: B não pode guardar ficheiros na pasta de A, mas pode na sua
   begin
     insert into storage.objects (bucket_id, name, owner) values ('capturas', a::text || '/x.png', b);

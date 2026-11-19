@@ -84,6 +84,9 @@ _Última atualização: 06/11/2026 · Fase atual: 5 — Desenvolvimento · Fase 
 | D69 | Cópias de segurança: exportação pelo utilizador (JSON completo / CSV com proteção contra fórmulas) + lembrete se > 30 dias | Plano gratuito sem cópias recuperáveis. |
 | D70 | Tarefa GitHub de 3 em 3 dias chama public.manter_ativo() (devolve 1) com a chave publicável | Evitar pausa por inatividade do Supabase gratuito. |
 | D71 | Manual de utilização dentro da app (/ajuda): rotina, indicadores, fontes, custos e limites, segurança, problemas | Sempre à mão; sem domínio próprio (decisão do utilizador). |
+| D72 | Histórico do sentimento recalculado com a mesma fórmula (sem dados do futuro): VIX CBOE + SPY/AUD-JPY/ouro (Twelve Data, 1 pedido por símbolo para 4 anos) | Pedido do utilizador; verificado: mínimo 0 a 10/04/2025 (choque das tarifas). |
+| D73 | Força macro: registo diário por utilizador (tabela historico_forca, RLS) feito após abrir o painel/Macro (after), porque depende das leituras do utilizador | Sem histórico das leituras antes de hoje. |
+| D74 | Força pelo preço: desempenho log de cada moeda face à média das 8, a partir de 7 pares vs USD (cruzamentos derivam deles); recomeça em 0 no início do período | 7 pedidos em vez de 28; separadores distintos para não ultrapassar 8 pedidos/min. |
 | D8 | Diário com registo manual rápido na 1.ª versão; importação MT fica para depois | Com 1–2 operações/semana, registo manual é viável e mais rico. |
 
 ## Conceito em formação
@@ -133,6 +136,7 @@ e mede com dados reais o que funciona (ou não) para o utilizador.
 - [x] Fase 6: segurança (função 2FA privada, CSP, npm audit 0), desempenho (LCP ~1,1 s em telemóvel lento), acessibilidade (0 violações), páginas de erro em PT, "Pares" na barra do telemóvel
 - [x] Fase 7: exportação dos dados (JSON completo e CSV para Excel) + lembrete mensal no painel; tarefa automática para o Supabase não pausar; manual de utilização com custos e limites (página /ajuda)
 - [ ] SMTP próprio (opcional, utilizador)
+- [x] Histórico (pedido do utilizador): sentimento de risco recalculado 2 anos; força das moedas pelo preço (12 meses, 7 pares vs USD); força macro registada diariamente desde 19/11/2026; página /historico com comparação de moedas; botões "Ver histórico" no painel, Macro e em cada moeda; 91 testes
 - [ ] Painel e "Pares em destaque": passar a usar tendência e ATR reais (hoje ainda de exemplo)
 - [ ] Testar Twelve Data (velas H1/H4) antes da Etapa 5
 

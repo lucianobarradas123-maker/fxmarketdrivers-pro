@@ -24,6 +24,7 @@ const PATHS: Record<NavItem["icon"], React.ReactNode> = {
   shield: <path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5z" strokeLinejoin="round" />,
   book: <path d="M5 2h10v16H5zM8 6h4M8 10h4" strokeLinejoin="round" strokeLinecap="round" />,
   pairs: <path d="M4 7h11l-3-3M16 13H5l3 3" strokeLinecap="round" strokeLinejoin="round" />,
+  chart: <path d="M3 16l4-5 3 3 6-8M3 3v14h14" strokeLinecap="round" strokeLinejoin="round" />,
 };
 
 export function Icon({ name, size = 20 }: { name: NavItem["icon"]; size?: number }) {

@@ -7,6 +7,10 @@ import { Disclaimer, PageHeader } from "@/components/ui/PageHeader";
 import { getMacro, MACRO_META } from "@/lib/macro/build";
 import { getReadings } from "@/lib/macro/readings";
 import { getRiskSentimentSafe } from "@/lib/sentiment-data";
+import { after } from "next/server";
+import { recordStrength } from "@/lib/history-data";
+import { STANCE_POINTS } from "@/lib/macro/score";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Macro" };
 
@@ -18,6 +22,13 @@ function fmt(iso: string) {
 async function Currencies() {
   const [risk, readings] = await Promise.all([getRiskSentimentSafe(), getReadings()]);
   const currencies = getMacro(risk, readings);
+  const supabase = await createClient();
+  after(() =>
+    recordStrength(
+      supabase,
+      currencies.map((c) => ({ code: c.code, total: c.total, dataScore: c.dataScore, stancePoints: STANCE_POINTS[c.stance], riskScore: c.riskScore })),
+    ),
+  );
   return (
     <>
       <RiskPanel risk={risk} />

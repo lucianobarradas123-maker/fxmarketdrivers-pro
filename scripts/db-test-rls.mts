@@ -21,6 +21,7 @@ const EXPECTED = [
   "B altera operações de A=0",
   "B vê definições de A=0",
   "fechada sem saída=recusada",
+  "B vê histórico de A=0",
   "B grava na pasta de A=recusado",
   "A vê capturas de B=0",
   "anónimo=recusado",
