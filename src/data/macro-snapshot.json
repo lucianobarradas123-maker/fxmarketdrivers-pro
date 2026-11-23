@@ -1,6 +1,6 @@
 {
   "source": "OCDE (OECD Data Explorer, sdmx.oecd.org)",
-  "fetchedAt": "2026-11-19T15:36:58.666Z",
+  "fetchedAt": "2026-11-23T07:48:12.986Z",
   "kind": "fim-de-dia",
   "currencies": {
     "USD": {
@@ -41,17 +41,17 @@
         "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/USA+GBR+AUS+NZL.M+Q.N+HICP.CPI.PA._T.N.GY?lastNObservations=1"
       },
       "unemployment": {
-        "value": 4.7,
-        "period": "2026-07",
-        "sixMonthsAgo": 4.9,
-        "sixMonthsAgoPeriod": "2026-01",
+        "value": 4.6,
+        "period": "2026-08",
+        "sixMonthsAgo": 5,
+        "sixMonthsAgoPeriod": "2026-02",
         "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_LFS@DF_IALFS_UNE_M,1.0/USA+EA+GBR+JPN+CHE+CAN+AUS+NZL..._Z.Y._T.Y_GE15..M+Q?lastNObservations=7"
       }
     },
     "JPY": {
       "inflation": {
-        "value": 2.1,
-        "period": "2026-09",
+        "value": 2.3,
+        "period": "2026-10",
         "measure": "IPC",
         "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES_COICOP2018@DF_PRICES_C2018_ALL,1.0/EA+JPN+CHE+CAN.M+Q.N+HICP.CPI.PA._T.N.GY?lastNObservations=1"
       },
@@ -101,10 +101,10 @@
         "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/USA+GBR+AUS+NZL.M+Q.N+HICP.CPI.PA._T.N.GY?lastNObservations=1"
       },
       "unemployment": {
-        "value": 4.72,
-        "period": "2026-09",
-        "sixMonthsAgo": 4.29,
-        "sixMonthsAgoPeriod": "2026-03",
+        "value": 4.86,
+        "period": "2026-10",
+        "sixMonthsAgo": 4.5,
+        "sixMonthsAgoPeriod": "2026-04",
         "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_LFS@DF_IALFS_UNE_M,1.0/USA+EA+GBR+JPN+CHE+CAN+AUS+NZL..._Z.Y._T.Y_GE15..M+Q?lastNObservations=7"
       }
     },
