@@ -1,6 +1,6 @@
 {
   "source": "OCDE (OECD Data Explorer, sdmx.oecd.org)",
-  "fetchedAt": "2026-11-23T07:48:12.986Z",
+  "fetchedAt": "2026-11-26T15:39:20.622Z",
   "kind": "fim-de-dia",
   "currencies": {
     "USD": {
@@ -95,8 +95,8 @@
     },
     "AUD": {
       "inflation": {
-        "value": 4.34,
-        "period": "2026-09",
+        "value": 4.92,
+        "period": "2026-10",
         "measure": "IPC",
         "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/USA+GBR+AUS+NZL.M+Q.N+HICP.CPI.PA._T.N.GY?lastNObservations=1"
       },
